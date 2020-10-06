@@ -17,6 +17,14 @@ class Geom_1d(Domain_1d):
     def __init__(self, label, width):
         super().__init__(label, width)
 
+    def add_intv(self):
+        """Add intervals."""
+        pass
+
     def add_bndy(self):
         """Add boundaries."""
+        pass
+
+    def add_mat(self):
+        """Add materials."""
         pass
