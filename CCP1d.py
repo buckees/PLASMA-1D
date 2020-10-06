@@ -51,20 +51,30 @@ class CCP_1d(object):
 
     def plot_plasma(self):
         """Plot 1d mesh in X."""
-        fig, axes = plt.subplots(1, 2, figsize=(8, 4),
+        x = self.geom.x
+        fig, axes = plt.subplots(1, 3, figsize=(12, 3),
                                  constrained_layout=True)
         # plot densities
         ax = axes[0]
-        ax.plot(self.x, self.ne, 'b-')
-        ax.plot(self.x, self.ni, 'r-')
-        # add legend
+        ax.plot(x, self.ne, 'b-')
+        ax.plot(x, self.ni, 'r-')
         ax.legend(['E', 'Ion'])
+        ax.set_xlabel('Position (m)')
+        ax.set_ylabel('Density (m^-3)')
         # plot fluxes
         ax = axes[1]
-        ax.plot(self.x, self.fluxe, 'b-')
-        ax.plot(self.x, self.fluxi, 'r-')
-        # add legend
+        ax.plot(x, self.fluxe, 'b-')
+        ax.plot(x, self.fluxi, 'r-')
         ax.legend(['flux E', 'flux Ion'])
+        ax.set_xlabel('Position (m)')
+        ax.set_ylabel('Flux (m^-2s^-1)')
+        # plot temperature
+        ax = axes[2]
+        ax.plot(x, self.Te, 'b-')
+        ax.plot(x, self.Ti, 'r-')
+        ax.legend(['Te', 'Ti'])
+        ax.set_xlabel('Position (m)')
+        ax.set_ylabel('Temperature (eV)')
         # show fig
         plt.show(fig)
 
@@ -97,3 +107,7 @@ if __name__ == '__main__':
     """Test Mesh."""
     mesh1d = Mesh_1d('CCP_1d', 10e-2, nx=101)
     print(mesh1d)
+    ccp1d = CCP_1d(mesh1d)
+    ccp1d.init_plasma()
+    ccp1d.plot_plasma()
+
