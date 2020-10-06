@@ -78,6 +78,13 @@ class CCP_1d(object):
         # show fig
         plt.show(fig)
 
+    def init_pot(self, phi=0.0):
+        """Initiate potential attributes."""
+        nx = self.geom.nx
+        self.pot = np.ones(nx)*phi  # initial uniform potential
+        self.ef = np.zeros_like(self.pot)  # initial uniform E-field
+        self.ef_ambi = np.zeros_like(self.pot)  # initial ambipolar E-field
+
     def add_bndy(self):
         """Add boundaries."""
         pass
