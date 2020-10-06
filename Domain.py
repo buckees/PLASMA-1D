@@ -25,7 +25,7 @@ class Domain_1d(Domain):
         self.width = width
 
     def __str__(self):
-        """Print 1D Domain information."""
+        """Print 1d domain information."""
         res = 'Domain_1d:'
         res += '\n' + super().__str__()
         res += f'\nwidth = {self.width} m'
