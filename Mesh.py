@@ -9,6 +9,7 @@ Mesh contains:
 from Geometry import Geom_1d
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Mesh_1d(Geom_1d):
@@ -37,6 +38,14 @@ class Mesh_1d(Geom_1d):
         """Add materials."""
         pass
 
+    def plot_mesh(self):
+        """Plot 1d mesh in X."""
+        fig, ax = plt.subplots(1, 1, figsize=(4, 4),
+                               constrained_layout=True)
+        y = np.zeros_like(self.x)
+        ax.plot(self.x, y, 'o')
+        plt.show(fig)
+
     def cnt_diff(self, y):
         """
         Caculate dy/dx using central differencing.
@@ -61,3 +70,4 @@ if __name__ == '__main__':
                      nx=101)
     # print(geom1d)
     print(mesh1d)
+    mesh1d.plot_mesh()
