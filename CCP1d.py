@@ -50,7 +50,11 @@ class CCP_1d(object):
         self.Si = np.ones_like(self.ne)*Se  # initial ion source term
 
     def plot_plasma(self):
-        """Plot 1d mesh in X."""
+        """
+        Plot plasma variables vs. position x.
+
+        density, flux, temperature
+        """
         x = self.geom.x
         fig, axes = plt.subplots(1, 3, figsize=(12, 3),
                                  constrained_layout=True)
@@ -85,6 +89,22 @@ class CCP_1d(object):
         self.ef = np.zeros_like(self.pot)  # initial uniform E-field
         self.ef_ambi = np.zeros_like(self.pot)  # initial ambipolar E-field
 
+    def plot_pot(self):
+        """Plot potential, E-field."""
+        x = self.geom.x
+        fig, axes = plt.subplots(1, 2, figsize=(8, 4),
+                                 constrained_layout=True)
+        # plot potential
+        ax = axes[0]
+        ax.plot(x, self.pot, 'y-')
+        ax.legend(['Potential'])
+        # plot E-field
+        ax = axes[1]
+        ax.plot(x, self.ef, 'g-')
+        ax.legend(['E-field'])
+        # show fig
+        plt.show(fig)
+
     def add_bndy(self):
         """Add boundaries."""
         pass
@@ -117,4 +137,6 @@ if __name__ == '__main__':
     ccp1d = CCP_1d(mesh1d)
     ccp1d.init_plasma()
     ccp1d.plot_plasma()
+    ccp1d.init_pot()
+    ccp1d.plot_pot()
 
