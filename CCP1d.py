@@ -118,6 +118,25 @@ class CCP_1d(object):
         self.Mue = np.ones(nx)*Mue  # initial eon mobility
         self.Mui = np.ones_like(self.Mue)*Mui  # initial ion mobility
 
+    def plot_transp(self):
+        """Plot potential, E-field."""
+        x = self.geom.x
+        fig, axes = plt.subplots(1, 2, figsize=(8, 4),
+                                 constrained_layout=True)
+        # plot potential
+        ax = axes[0]
+        ax.plot(x, self.De, 'b-')
+        ax.plot(x, self.Di, 'r-')
+        ax.legend(['e Diffusion Coeff', 'Ion Diffusion Coeff'])
+        # plot E-field
+        ax = axes[1]
+        ax.plot(x, self.Mue, 'b-')
+        ax.plot(x, self.Mui, 'r-')
+        ax.legend(['e Mobility', 'Ion Mobility'])
+        # show fig
+        plt.show(fig)
+
+
 if __name__ == '__main__':
     """Test Mesh."""
     mesh1d = Mesh_1d('CCP_1d', 10e-2, nx=101)
@@ -127,3 +146,5 @@ if __name__ == '__main__':
     ccp1d.plot_plasma()
     ccp1d.init_pot()
     ccp1d.plot_pot()
+    ccp1d.init_transp()
+    ccp1d.plot_transp()
