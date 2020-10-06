@@ -105,6 +105,18 @@ class CCP_1d(object):
         # show fig
         plt.show(fig)
 
+    def init_transp(self, De=5e-1, Di=5e-3, Mue=1.0, Mui=1e-4):
+        """
+        Initiate diffusion coefficient and mobility.
+
+        initial De=5e-1, Di=5e-3, in m^2/s
+        initial Mue=1.0, Mui=1e-4 in (m/s)*(m/V)
+        """
+        nx = self.geom.nx
+        self.De = np.ones(nx)*De  # initial eon diff coeff
+        self.Di = np.ones_like(self.De)*Di  # initial ion diff coeff
+        self.Mue = np.ones(nx)*Mue  # initial eon mobility
+        self.Mui = np.ones_like(self.Mue)*Mui  # initial ion mobility
 
 if __name__ == '__main__':
     """Test Mesh."""
