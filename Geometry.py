@@ -28,3 +28,8 @@ class Geom_1d(Domain_1d):
     def add_mat(self):
         """Add materials."""
         pass
+
+if __name__ == '__main__':
+    """Test Geometry."""
+    geom1d = Geom_1d('A', 10e-2)
+    print(geom1d)
