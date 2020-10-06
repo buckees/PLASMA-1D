@@ -9,6 +9,7 @@ CCP_1d contains:
 from Mesh import Mesh_1d
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class CCP_1d(object):
@@ -47,6 +48,25 @@ class CCP_1d(object):
         self.Ti = np.ones_like(self.ne)*Ti  # initial ion temperature
         self.Se = np.ones_like(self.ne)*Se  # initial e source term
         self.Si = np.ones_like(self.ne)*Se  # initial ion source term
+
+    def plot_plasma(self):
+        """Plot 1d mesh in X."""
+        fig, axes = plt.subplots(1, 2, figsize=(8, 4),
+                                 constrained_layout=True)
+        # plot densities
+        ax = axes[0]
+        ax.plot(self.x, self.ne, 'b-')
+        ax.plot(self.x, self.ni, 'r-')
+        # add legend
+        ax.legend(['E', 'Ion'])
+        # plot fluxes
+        ax = axes[1]
+        ax.plot(self.x, self.fluxe, 'b-')
+        ax.plot(self.x, self.fluxi, 'r-')
+        # add legend
+        ax.legend(['flux E', 'flux Ion'])
+        # show fig
+        plt.show(fig)
 
     def add_bndy(self):
         """Add boundaries."""
