@@ -10,7 +10,7 @@ Output: plasma flux
 
 import numpy as np
 import matplotlib.pyplot as plt
-
+import copy
 
 class DD_Base():
     """Define the base class for Drift-Diffusion and Ambipolar."""
@@ -65,6 +65,7 @@ class DD_Base():
         Calc mobility
         output: diffusion coeff and mobility
         """
+        self.init_transp()
         # self.De =
         # self.Di =
         pass
@@ -75,10 +76,21 @@ class DD_Base():
         self.fluxe = self.De*dnedx
         dnidx = self.geom.cnt_diff(CCP_1d.ni)
         self.fluxi = self.Di*dnidx
+        # self.bndy_flux()
+
+    def bndy_flux(self):
+        """Impose b.c. to flux."""
+        self.fluxe[1], self.fluxe[-2] = self.fluxe[2], self.fluxe[-3]
+        self.fluxi[1], self.fluxi[-2] = self.fluxi[2], self.fluxi[-3]
 
 
 class Ambipolar(DD_Base):
-    """Define Ambipolar Physics."""
+    """
+    Define Ambipolar Physics.
+
+    Input: Geometry, Te/Ti, ne/ni
+    Output: Flux, E-field
+    """
 
     def calc_ambi(self, CCP_1d):
         """
@@ -93,20 +105,35 @@ class Ambipolar(DD_Base):
         Da = (De*Mui + Di*Mue)/(Mue + Mui)
         Da = Di(1 + Te/Ti).
         Ea = (Di - De)/(Mui + Mue)*dn/dx/n
+        Orginal Ambipolar Coeff Da = (De*Mui + Di*Mue)/(Mue + Mui)
+        self.Da = (CCP_1d.De*CCP_1d.Mui + CCP_1d.Di*CCP_1d.Mue) / \
+                  (CCP_1d.Mue + CCP_1d.Mui)
+        Assume Te >> Ti, Ambipolar Coeff can be simplified as
+        Da = Di(1 + Te/Ti).
         """
-        # Orginal Ambipolar Coeff Da = (De*Mui + Di*Mue)/(Mue + Mui)
-        # self.Da = (CCP_1d.De*CCP_1d.Mui + CCP_1d.Di*CCP_1d.Mue) / \
-        #           (CCP_1d.Mue + CCP_1d.Mui)
-        # Assume Te >> Ti, Ambipolar Coeff can be simplified as
-        # Da = Di(1 + Te/Ti).
-        self.Da = CCP_1d.Di*(1 + np.divide(CCP_1d.Te, CCP_1d.Ti))
-        self.Ea = (CCP_1d.Di - CCP_1d.De)/(CCP_1d.Mui + CCP_1d.Mue)
-        dnidx = CCP_1d.geom.cnt_diff(CCP_1d.ni)
+        self.calc_transp(CCP_1d)
+        self.Da = self.Di*(1 + CCP_1d.Te / CCP_1d.Ti)
+        self.Ea = (self.Di - self.De)/(self.Mui + self.Mue)
+        dnidx = self.geom.cnt_diff(CCP_1d.ni)
         self.Ea *= np.divide(dnidx, CCP_1d.ni,
                              out=np.zeros_like(dnidx), where=CCP_1d.ni != 0)
-        self.Ea[1] = self.Ea[2]
-        self.Ea[-2] = self.Ea[-3]
-        return self.Da, self.Ea
+        self.bndy_Ea()
+
+    def bndy_Ea(self):
+        """Impose b.c. to Ea."""
+        self.Ea[1], self.Ea[-2] = self.Ea[2], self.Ea[-3]
+
+    def calc_flux(self, CCP_1d):
+        """Calc Ambipolar flux."""
+        self.calc_ambi(CCP_1d)
+        self.De, self.Di = self.Da, self.Da
+        self.calc_diff(CCP_1d)
+        self.fluxe = copy.deepcopy(self.fluxi)
+        return self.fluxe, self.fluxi
+
+    def calc_ne(self, CCP_1d):
+        """Calc ne = sum(ni), ensure charge neutrality."""
+        return copy.deepcopy(CCP_1d.ni)
 
 
 class Drift_Diff(DD_Base):
@@ -119,3 +146,20 @@ class Drift_Diff(DD_Base):
         The drift-diffusion approximation:
         """
         pass
+
+
+if __name__ == '__main__':
+    """Test the Ambipolar."""
+    from Mesh import Mesh_1d
+    from CCP1d import CCP_1d
+    mesh1d = Mesh_1d('CCP_1d', 10e-2, nx=101)
+    print(mesh1d)
+    ccp1d = CCP_1d(mesh1d)
+    ccp1d.init_plasma()
+    # ccp1d.plot_plasma()
+    ccp1d.init_pot()
+    # ccp1d.plot_pot()
+    ambi = Ambipolar(mesh1d)
+    # ambi.plot_transp()
+    ccp1d.fluxe, ccp1d.fluxi = ambi.calc_flux(ccp1d)
+    print(ambi.__dict__)
