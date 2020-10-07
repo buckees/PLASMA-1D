@@ -140,10 +140,27 @@ class CCP_1d(object):
 
 if __name__ == '__main__':
     """Test CCP_1d."""
-    mesh1d = Mesh_1d('CCP_1d', 10e-2, nx=101)
+    from Drift_Diff import Ambipolar, Diffusion
+    mesh1d = Mesh_1d('CCP_1d', 10e-2, nx=51)
     print(mesh1d)
     ccp1d = CCP_1d(mesh1d)
     ccp1d.init_plasma()
     ccp1d.plot_plasma()
     ccp1d.init_pot()
-    ccp1d.plot_pot()
+    # ccp1d.plot_pot()
+    # ambi = Ambipolar(mesh1d)
+    diff = Diffusion(mesh1d)
+    ne_ave, ni_ave = [], []
+    time = []
+    dt = 1e-6
+    for niter in range(1000):
+        # ccp1d.fluxe, ccp1d.fluxi = ambi.calc_flux(ccp1d)
+        ccp1d.fluxe, ccp1d.fluxi = diff.calc_flux(ccp1d)
+        ccp1d.evolve(dt)
+        ccp1d.bndy_plasma()
+        ccp1d.limit_plasma()
+        ne_ave.append(np.mean(ccp1d.ne))
+        ni_ave.append(np.mean(ccp1d.ni))
+        time.append(dt*(niter+1))
+        if not (niter+1) % 100:
+            ccp1d.plot_plasma()
