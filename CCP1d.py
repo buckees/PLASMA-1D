@@ -49,6 +49,7 @@ class CCP_1d(object):
         self.Se = np.ones_like(self.ne)*Se  # initial e source term
         self.Si = np.ones_like(self.ne)*Se  # initial ion source term
         self.bndy_plasma()
+        self.limit_plasma()
 
     def bndy_plasma(self):
         """Impose b.c. on the plasma."""
@@ -59,6 +60,14 @@ class CCP_1d(object):
         self.Ti[0], self.Ti[-1] = 0.0, 0.0
         self.Se[0], self.Se[-1] = 0.0, 0.0
         self.Si[0], self.Si[-1] = 0.0, 0.0
+
+    def limit_plasma(self, n_min=1e11, n_max=1e22, T_min=0.001, T_max=100.0):
+        """Limit variables in the plasma."""
+        self.ne = np.clip(self.ne, n_min, n_max)
+        self.ni = np.clip(self.ni, n_min, n_max)
+        self.nn = np.clip(self.nn, n_min, n_max)
+        self.Te = np.clip(self.Te, T_min, T_max)
+        self.Ti = np.clip(self.Ti, T_min, T_max)
 
     def plot_plasma(self):
         """
