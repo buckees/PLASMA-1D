@@ -117,11 +117,13 @@ class Ambipolar(DD_Base):
         dnidx = self.geom.cnt_diff(CCP_1d.ni)
         self.Ea *= np.divide(dnidx, CCP_1d.ni,
                              out=np.zeros_like(dnidx), where=CCP_1d.ni != 0)
-        self.bndy_Ea()
+        self.bndy_ambi()
 
-    def bndy_Ea(self):
+    def bndy_ambi(self):
         """Impose b.c. to Ea."""
+        self.Ea[0], self.Ea[-1] = 0.0, 0.0
         self.Ea[1], self.Ea[-2] = self.Ea[2], self.Ea[-3]
+        self.Da[0], self.Da[-1] = 0.0, 0.0
 
     def calc_flux(self, CCP_1d):
         """Calc Ambipolar flux."""
