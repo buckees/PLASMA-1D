@@ -57,28 +57,6 @@ class DD_Base():
         # show fig
         plt.show(fig)
 
-    def calc_diff(self, CCP_1d):
-        """Calc diffusion term in flux."""
-        dnedx = self.geom.cnt_diff(CCP_1d.ne)
-        self.fluxe = self.De*dnedx
-        dnidx = self.geom.cnt_diff(CCP_1d.ni)
-        self.fluxi = self.Di*dnidx
-
-
-class Drift_Diff(object):
-    """Define Drift-Diffusion Physics."""
-
-    def __init__(self, CCP_1d):
-        self.fluxe = CCP_1d.fluxe
-        self.fluxi = CCP_1d.fluxi
-        # variables below are not outputs
-        self.De = CCP_1d.De
-        self.Di = CCP_1d.Di
-
-    def __str__(self):
-        """Print Drift-Diffusion Approximation."""
-        return f'label = {self.fluxe}'
-
     def calc_transp(self, CCP1d):
         """
         Calc transport coeff.
@@ -89,14 +67,38 @@ class Drift_Diff(object):
         """
         # self.De =
         # self.Di =
-        return self.De, self.Di
+        pass
 
-    def calc_flux(self, CCP_1d):
-        """
-        Calc plasma flux.
+    def calc_diff(self, CCP_1d):
+        """Calc diffusion term in flux."""
+        dnedx = self.geom.cnt_diff(CCP_1d.ne)
+        self.fluxe = self.De*dnedx
+        dnidx = self.geom.cnt_diff(CCP_1d.ni)
+        self.fluxi = self.Di*dnidx
 
-        The drift-diffusion approximation:
+
+class Ambipolar(DD_Base):
+    """Define Ambipolar Physics."""
+
+    def calc_ambi(self, CCP_1d):
         """
+        Calc ambipolar diffusion coefficient.
+
+        The ambipolar diffusion assumptions:
+            1. steady state, dne/dt = 0. it cannot be used to
+            describe plasma decay.
+            2. ni is calculated from continuity equation.
+            3. plasma is charge neutral, ne = ni
+            4. Ionization Se is needed to balance diffusion loss.
+        Da = (De*Mui + Di*Mue)/(Mue + Mui)
+        Da = Di(1 + Te/Ti).
+        Ea = (Di - De)/(Mui + Mue)*dn/dx/n
+        """
+        # Orginal Ambipolar Coeff Da = (De*Mui + Di*Mue)/(Mue + Mui)
+        # self.Da = (CCP_1d.De*CCP_1d.Mui + CCP_1d.Di*CCP_1d.Mue) / \
+        #           (CCP_1d.Mue + CCP_1d.Mui)
+        # Assume Te >> Ti, Ambipolar Coeff can be simplified as
+        # Da = Di(1 + Te/Ti).
         self.Da = CCP_1d.Di*(1 + np.divide(CCP_1d.Te, CCP_1d.Ti))
         self.Ea = (CCP_1d.Di - CCP_1d.De)/(CCP_1d.Mui + CCP_1d.Mue)
         dnidx = CCP_1d.geom.cnt_diff(CCP_1d.ni)
@@ -105,3 +107,15 @@ class Drift_Diff(object):
         self.Ea[1] = self.Ea[2]
         self.Ea[-2] = self.Ea[-3]
         return self.Da, self.Ea
+
+
+class Drift_Diff(DD_Base):
+    """Define Drift-Diffusion Physics."""
+
+    def calc_flux(self, CCP_1d):
+        """
+        Calc plasma flux.
+
+        The drift-diffusion approximation:
+        """
+        pass
