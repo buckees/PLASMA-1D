@@ -172,7 +172,7 @@ if __name__ == '__main__':
     """Test the Ambipolar."""
     from Mesh import Mesh_1d
     from CCP1d import CCP_1d
-    mesh1d = Mesh_1d('CCP_1d', 10e-2, nx=101)
+    mesh1d = Mesh_1d('CCP_1d', 10e-2, nx=11)
     print(mesh1d)
     ccp1d = CCP_1d(mesh1d)
     ccp1d.init_plasma()
@@ -182,4 +182,5 @@ if __name__ == '__main__':
     ambi = Ambipolar(mesh1d)
     # ambi.plot_transp()
     ccp1d.fluxe, ccp1d.fluxi = ambi.calc_flux(ccp1d)
-    print(ambi.__dict__)
+    print(ccp1d.fluxe)
+    # print(ambi.__dict__)
