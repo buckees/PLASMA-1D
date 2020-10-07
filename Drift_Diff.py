@@ -40,8 +40,8 @@ class DD_Base():
         self.Di = np.ones_like(self.De)*Di  # initial ion diff coeff
         self.Mue = np.ones(nx)*Mue  # initial eon mobility
         self.Mui = np.ones_like(self.Mue)*Mui  # initial ion mobility
-        self.bndy_transp()
-        self.limit_transp()
+        # self.bndy_transp()
+        # self.limit_transp()
 
     def bndy_transp(self):
         """Impose b.c. on transport coeff."""
@@ -135,7 +135,7 @@ class Ambipolar(DD_Base):
         dnidx = self.geom.cnt_diff(CCP_1d.ni)
         self.Ea *= np.divide(dnidx, CCP_1d.ni,
                              out=np.zeros_like(dnidx), where=CCP_1d.ni != 0)
-        self.bndy_ambi()
+        # self.bndy_ambi()
 
     def bndy_ambi(self):
         """Impose b.c. to Ea."""
@@ -156,7 +156,23 @@ class Ambipolar(DD_Base):
         return copy.deepcopy(CCP_1d.ni)
 
 
+class Diffusion(DD_Base):
+    """
+    Diffusion only.
+
+    No interactions between electrons and ions.
+    They diffuse independently.
+    """
+
+    def calc_flux(self, CCP_1d):
+        """Calc diffusion coeff."""
+        self.calc_transp(CCP_1d)
+        self.calc_diff(CCP_1d)
+        return self.fluxe, self.fluxi
+
+
 class Drift_Diff(DD_Base):
+    pass
     """Define Drift-Diffusion Physics."""
 
     def calc_flux(self, CCP_1d):
@@ -179,8 +195,11 @@ if __name__ == '__main__':
     # ccp1d.plot_plasma()
     ccp1d.init_pot()
     # ccp1d.plot_pot()
-    ambi = Ambipolar(mesh1d)
+    # ambi = Ambipolar(mesh1d)
+    diff = Diffusion(mesh1d)
     # ambi.plot_transp()
-    ccp1d.fluxe, ccp1d.fluxi = ambi.calc_flux(ccp1d)
+    # ccp1d.fluxe, ccp1d.fluxi = ambi.calc_flux(ccp1d)
+    ccp1d.fluxe, ccp1d.fluxi = diff.calc_flux(ccp1d)
+    diff.plot_transp()
     print(ccp1d.fluxe)
     # print(ambi.__dict__)
