@@ -1,8 +1,10 @@
 """
-Define Physics Module Ambipolar.
+Define Physics Module - Ambipolar.
 
+Input: plasma variables
 Calc Ambipolar diffusion coeff
 Calc Ambipolar E-field
+Output: Da, Ea
 """
 
 import numpy as np
@@ -31,7 +33,7 @@ class Ambipolar(object):
             4. Ionization Se is needed to balance diffusion loss.
         Da = Di + De*Mui/Mue
         Da = Di(1 + Te/Ti).
-        Es = (Di - De)/(Mui + Mue)*dn/dx/n
+        Ea = (Di - De)/(Mui + Mue)*dn/dx/n
         """
         self.Da = CCP_1d.Di*(1 + np.divide(CCP_1d.Te, CCP_1d.Ti))
         self.Ea = (CCP_1d.Di - CCP_1d.De)/(CCP_1d.Mui + CCP_1d.Mue)
