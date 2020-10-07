@@ -40,15 +40,19 @@ class DD_Base():
         self.Di = np.ones_like(self.De)*Di  # initial ion diff coeff
         self.Mue = np.ones(nx)*Mue  # initial eon mobility
         self.Mui = np.ones_like(self.Mue)*Mui  # initial ion mobility
-        # self.bndy_transp()
-        # self.limit_transp()
+        self.bndy_transp()
+        self.limit_transp()
 
     def bndy_transp(self):
         """Impose b.c. on transport coeff."""
-        self.De[0], self.De[-1] = 0.0, 0.0
-        self.Di[0], self.Di[-1] = 0.0, 0.0
-        self.Mue[0], self.Mue[-1] = 0.0, 0.0
-        self.Mui[0], self.Mui[-1] = 0.0, 0.0
+        # self.De[0], self.De[-1] = 0.0, 0.0
+        # self.Di[0], self.Di[-1] = 0.0, 0.0
+        # self.Mue[0], self.Mue[-1] = 0.0, 0.0
+        # self.Mui[0], self.Mui[-1] = 0.0, 0.0
+        self.De[0], self.De[-1] = self.De[1], self.De[-2]
+        self.Di[0], self.Di[-1] = self.Di[1], self.Di[-2]
+        self.Mue[0], self.Mue[-1] = self.Mue[1], self.Mue[-2]
+        self.Mui[0], self.Mui[-1] = self.Mui[1], self.Mui[-2]
 
     def limit_transp(self, D_min=1e-6, D_max=1e3, M_min=1e-7, M_max=1e3):
         """Limit variables in the plasma."""
