@@ -48,6 +48,17 @@ class CCP_1d(object):
         self.Ti = np.ones_like(self.ne)*Ti  # initial ion temperature
         self.Se = np.ones_like(self.ne)*Se  # initial e source term
         self.Si = np.ones_like(self.ne)*Se  # initial ion source term
+        self.bndy_plasma()
+
+    def bndy_plasma(self):
+        """Impose b.c. on the plasma."""
+        self.ne[0], self.ne[-1] = 0.0, 0.0
+        self.ni[0], self.ni[-1] = 0.0, 0.0
+        self.nn[0], self.nn[-1] = 0.0, 0.0
+        self.Te[0], self.Te[-1] = 0.0, 0.0
+        self.Ti[0], self.Ti[-1] = 0.0, 0.0
+        self.Se[0], self.Se[-1] = 0.0, 0.0
+        self.Si[0], self.Si[-1] = 0.0, 0.0
 
     def plot_plasma(self):
         """
@@ -115,5 +126,3 @@ if __name__ == '__main__':
     ccp1d.plot_plasma()
     ccp1d.init_pot()
     ccp1d.plot_pot()
-    ccp1d.init_transp()
-    ccp1d.plot_transp()
