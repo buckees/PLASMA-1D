@@ -30,18 +30,18 @@ class CCP_1d(object):
         res = 'CCP_1d:'
         return res
 
-    def init_plasma(self, ne=1e17, nAr=3.3e20, Te=1, Ti=0.1, Se=1e20):
+    def init_plasma(self, ne=1e17, nn=3.3e20, Te=1, Ti=0.1, Se=1e20):
         """
         Initiate plasma attributes.
 
-        At 1 atm, nAr = 0.025e27 m^-3.
-        At 1 Torr, nAr = 3.3e22 m^-3.
-        At 1 mTorr, nAr = 3.3e19 m^-3.
+        At 1 atm, number density = 0.025e27 m^-3.
+        At 1 Torr, number density = 3.3e22 m^-3.
+        At 1 mTorr, number density = 3.3e19 m^-3.
         """
         nx = self.geom.nx
         self.ne = np.ones(nx)*ne  # initial uniform ne on 1d mesh
         self.ni = np.ones_like(self.ne)*ne  # initial ni to neutralize ne
-        self.nAr = np.ones_like(self.ne)*nAr  # initial Ar density
+        self.nn = np.ones_like(self.ne)*nn  # initial neutral density
         self.fluxe = np.zeros_like(self.ne)  # initial eon flux
         self.fluxi = np.zeros_like(self.ne)  # initial ion flux
         self.Te = np.ones_like(self.ne)*Te  # initial eon temperature
@@ -138,7 +138,7 @@ class CCP_1d(object):
 
 
 if __name__ == '__main__':
-    """Test Mesh."""
+    """Test CCP_1d."""
     mesh1d = Mesh_1d('CCP_1d', 10e-2, nx=101)
     print(mesh1d)
     ccp1d = CCP_1d(mesh1d)
