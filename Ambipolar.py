@@ -31,10 +31,15 @@ class Ambipolar(object):
             2. ni is calculated from continuity equation.
             3. plasma is charge neutral, ne = ni
             4. Ionization Se is needed to balance diffusion loss.
-        Da = Di + De*Mui/Mue
+        Da = (De*Mui + Di*Mue)/(Mue + Mui)
         Da = Di(1 + Te/Ti).
         Ea = (Di - De)/(Mui + Mue)*dn/dx/n
         """
+        # Orginal Ambipolar Coeff Da = (De*Mui + Di*Mue)/(Mue + Mui)
+        # self.Da = (CCP_1d.De*CCP_1d.Mui + CCP_1d.Di*CCP_1d.Mue) / \
+        #           (CCP_1d.Mue + CCP_1d.Mui)
+        # Assume Te >> Ti, Ambipolar Coeff can be simplified as
+        # Da = Di(1 + Te/Ti).
         self.Da = CCP_1d.Di*(1 + np.divide(CCP_1d.Te, CCP_1d.Ti))
         self.Ea = (CCP_1d.Di - CCP_1d.De)/(CCP_1d.Mui + CCP_1d.Mue)
         dnidx = CCP_1d.geom.cnt_diff(CCP_1d.ni)
