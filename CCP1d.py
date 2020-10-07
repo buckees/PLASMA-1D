@@ -125,9 +125,9 @@ class CCP_1d(object):
         # show fig
         plt.show(fig)
 
-    def evolve(self, delt):
+    def den_evolve(self, delt):
         """
-        Evolve the CCP by solving the continuity equation.
+        Evolve the density in CCP by solving the continuity equation.
 
         dn/dt = -dFlux/dx + Se
         dn(t + dt) = dn(t) - dFlux/dx*dt + Se*dt
@@ -157,7 +157,7 @@ if __name__ == '__main__':
     for itn in range(niter):
         ccp1d.fluxe, ccp1d.fluxi = ambi.calc_flux(ccp1d)
         # ccp1d.fluxe, ccp1d.fluxi = diff.calc_flux(ccp1d)
-        ccp1d.evolve(dt)
+        ccp1d.den_evolve(dt)
         ccp1d.bndy_plasma()
         ccp1d.limit_plasma()
         ne_ave.append(np.mean(ccp1d.ne))
