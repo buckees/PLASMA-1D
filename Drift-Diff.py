@@ -27,6 +27,7 @@ class DD_Base():
         """Print Drift-Diffusion Approximation."""
         return f'label = {self.fluxe}'
 
+    # De/Di, Mue/Mui, initial values are not corret
     def init_transp(self, De=5e-1, Di=5e-3, Mue=1.0, Mui=1e-4):
         """
         Initiate diffusion coefficient and mobility.
@@ -40,6 +41,7 @@ class DD_Base():
         self.Mue = np.ones(nx)*Mue  # initial eon mobility
         self.Mui = np.ones_like(self.Mue)*Mui  # initial ion mobility
         self.bndy_transp()
+        self.limit_transp()
 
     def bndy_transp(self):
         """Impose b.c. on transport coeff."""
@@ -47,6 +49,13 @@ class DD_Base():
         self.Di[0], self.Di[-1] = 0.0, 0.0
         self.Mue[0], self.Mue[-1] = 0.0, 0.0
         self.Mui[0], self.Mui[-1] = 0.0, 0.0
+
+    def limit_transp(self, D_min=1e-6, D_max=1e3, M_min=1e-7, M_max=1e3):
+        """Limit variables in the plasma."""
+        self.De = np.clip(self.De, D_min, D_max)
+        self.Di = np.clip(self.Di, D_min, D_max)
+        self.Mue = np.clip(self.Mue, M_min, M_max)
+        self.Mui = np.clip(self.Mui, M_min, M_max)
 
     def plot_transp(self):
         """Plot potential, E-field."""
