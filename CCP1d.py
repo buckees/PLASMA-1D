@@ -125,6 +125,18 @@ class CCP_1d(object):
         # show fig
         plt.show(fig)
 
+    def evolve(self, delt):
+        """
+        Evolve the CCP by solving the continuity equation.
+
+        dn/dt = -dFlux/dx + Se
+        dn(t + dt) = dn(t) - dFlux/dx*dt + Se*dt
+        """
+        dfluxe = self.geom.cnt_diff(self.fluxe)
+        self.ne -= dfluxe*delt
+        dfluxi = self.geom.cnt_diff(self.fluxi)
+        self.ni -= dfluxi*delt
+
 
 if __name__ == '__main__':
     """Test CCP_1d."""
