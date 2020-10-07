@@ -105,37 +105,6 @@ class CCP_1d(object):
         # show fig
         plt.show(fig)
 
-    def init_transp(self, De=5e-1, Di=5e-3, Mue=1.0, Mui=1e-4):
-        """
-        Initiate diffusion coefficient and mobility.
-
-        initial De=5e-1, Di=5e-3, in m^2/s
-        initial Mue=1.0, Mui=1e-4 in (m/s)*(m/V)
-        """
-        nx = self.geom.nx
-        self.De = np.ones(nx)*De  # initial eon diff coeff
-        self.Di = np.ones_like(self.De)*Di  # initial ion diff coeff
-        self.Mue = np.ones(nx)*Mue  # initial eon mobility
-        self.Mui = np.ones_like(self.Mue)*Mui  # initial ion mobility
-
-    def plot_transp(self):
-        """Plot potential, E-field."""
-        x = self.geom.x
-        fig, axes = plt.subplots(1, 2, figsize=(8, 4),
-                                 constrained_layout=True)
-        # plot potential
-        ax = axes[0]
-        ax.plot(x, self.De, 'b-')
-        ax.plot(x, self.Di, 'r-')
-        ax.legend(['e Diffusion Coeff', 'Ion Diffusion Coeff'])
-        # plot E-field
-        ax = axes[1]
-        ax.plot(x, self.Mue, 'b-')
-        ax.plot(x, self.Mui, 'r-')
-        ax.legend(['e Mobility', 'Ion Mobility'])
-        # show fig
-        plt.show(fig)
-
 
 if __name__ == '__main__':
     """Test CCP_1d."""
