@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import copy
 
+
 class DD_Base():
     """Define the base class for Drift-Diffusion and Ambipolar."""
 
@@ -38,6 +39,14 @@ class DD_Base():
         self.Di = np.ones_like(self.De)*Di  # initial ion diff coeff
         self.Mue = np.ones(nx)*Mue  # initial eon mobility
         self.Mui = np.ones_like(self.Mue)*Mui  # initial ion mobility
+        self.bndy_transp()
+
+    def bndy_transp(self):
+        """Impose b.c. on transport coeff."""
+        self.De[0], self.De[-1] = 0.0, 0.0
+        self.Di[0], self.Di[-1] = 0.0, 0.0
+        self.Mue[0], self.Mue[-1] = 0.0, 0.0
+        self.Mui[0], self.Mui[-1] = 0.0, 0.0
 
     def plot_transp(self):
         """Plot potential, E-field."""
