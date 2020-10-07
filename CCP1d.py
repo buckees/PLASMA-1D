@@ -148,19 +148,20 @@ if __name__ == '__main__':
     ccp1d.plot_plasma()
     ccp1d.init_pot()
     # ccp1d.plot_pot()
-    # ambi = Ambipolar(mesh1d)
-    diff = Diffusion(mesh1d)
+    ambi = Ambipolar(mesh1d)
+    # diff = Diffusion(mesh1d)
     ne_ave, ni_ave = [], []
     time = []
     dt = 1e-6
-    for niter in range(1000):
-        # ccp1d.fluxe, ccp1d.fluxi = ambi.calc_flux(ccp1d)
-        ccp1d.fluxe, ccp1d.fluxi = diff.calc_flux(ccp1d)
+    niter = 10000
+    for itn in range(niter):
+        ccp1d.fluxe, ccp1d.fluxi = ambi.calc_flux(ccp1d)
+        # ccp1d.fluxe, ccp1d.fluxi = diff.calc_flux(ccp1d)
         ccp1d.evolve(dt)
         ccp1d.bndy_plasma()
         ccp1d.limit_plasma()
         ne_ave.append(np.mean(ccp1d.ne))
         ni_ave.append(np.mean(ccp1d.ni))
         time.append(dt*(niter+1))
-        if not (niter+1) % 100:
+        if not (itn+1) % (niter/10):
             ccp1d.plot_plasma()
