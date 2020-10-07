@@ -44,7 +44,11 @@ class DD_Base():
         self.limit_transp()
 
     def bndy_transp(self):
-        """Impose b.c. on transport coeff."""
+        """
+        Impose b.c. on transport coeff.
+
+        Extension b.c.
+        """
         # self.De[0], self.De[-1] = 0.0, 0.0
         # self.Di[0], self.Di[-1] = 0.0, 0.0
         # self.Mue[0], self.Mue[-1] = 0.0, 0.0
@@ -139,13 +143,17 @@ class Ambipolar(DD_Base):
         dnidx = self.geom.cnt_diff(CCP_1d.ni)
         self.Ea *= np.divide(dnidx, CCP_1d.ni,
                              out=np.zeros_like(dnidx), where=CCP_1d.ni != 0)
-        # self.bndy_ambi()
+        self.bndy_ambi()
 
     def bndy_ambi(self):
-        """Impose b.c. to Ea."""
-        self.Ea[0], self.Ea[-1] = 0.0, 0.0
-        self.Ea[1], self.Ea[-2] = self.Ea[2], self.Ea[-3]
-        self.Da[0], self.Da[-1] = 0.0, 0.0
+        """
+        Impose b.c. to Ea.
+
+        Extension b.c.
+        """
+        self.Ea[0], self.Ea[-1] = self.Ea[1], self.Ea[-2]
+        # self.Ea[1], self.Ea[-2] = self.Ea[2], self.Ea[-3]
+        self.Da[0], self.Da[-1] = self.Da[1], self.Da[-2]
 
     def calc_flux(self, CCP_1d):
         """Calc Ambipolar flux."""
@@ -199,11 +207,12 @@ if __name__ == '__main__':
     # ccp1d.plot_plasma()
     ccp1d.init_pot()
     # ccp1d.plot_pot()
-    # ambi = Ambipolar(mesh1d)
-    diff = Diffusion(mesh1d)
+    ambi = Ambipolar(mesh1d)
+    # diff = Diffusion(mesh1d)
     # ambi.plot_transp()
-    # ccp1d.fluxe, ccp1d.fluxi = ambi.calc_flux(ccp1d)
-    ccp1d.fluxe, ccp1d.fluxi = diff.calc_flux(ccp1d)
-    diff.plot_transp()
+    ccp1d.fluxe, ccp1d.fluxi = ambi.calc_flux(ccp1d)
+    # ccp1d.fluxe, ccp1d.fluxi = diff.calc_flux(ccp1d)
+    ambi.plot_transp()
+    # diff.plot_transp()
     print(ccp1d.fluxe)
     # print(ambi.__dict__)
