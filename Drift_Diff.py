@@ -91,15 +91,15 @@ class DD_Base():
     def calc_diff(self, CCP_1d):
         """Calc diffusion term in flux."""
         dnedx = self.geom.cnt_diff(CCP_1d.ne)
-        self.fluxe = self.De*dnedx
+        self.fluxe = -self.De*dnedx
         dnidx = self.geom.cnt_diff(CCP_1d.ni)
-        self.fluxi = self.Di*dnidx
+        self.fluxi = -self.Di*dnidx
         # self.bndy_flux()
 
     def bndy_flux(self):
         """Impose b.c. to flux."""
-        self.fluxe[1], self.fluxe[-2] = self.fluxe[2], self.fluxe[-3]
-        self.fluxi[1], self.fluxi[-2] = self.fluxi[2], self.fluxi[-3]
+        self.fluxe[1], self.fluxe[-2] = 2*self.fluxe[2], 2*self.fluxe[-3]
+        self.fluxi[1], self.fluxi[-2] = 2*self.fluxi[2], 2*self.fluxi[-3]
 
 
 class Ambipolar(DD_Base):
