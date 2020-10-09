@@ -83,7 +83,7 @@ class DD_Base():
         # show fig
         plt.show(fig)
 
-    def calc_transp(self, CCP1d):
+    def calc_transp(self, Plasma1d):
         """
         Calc transport coeff.
 
@@ -96,11 +96,11 @@ class DD_Base():
         # self.Di =
         pass
 
-    def calc_diff(self, CCP_1d):
+    def calc_diff(self, Plasma_1d):
         """Calc diffusion term in flux."""
-        dnedx = self.geom.cnt_diff(CCP_1d.ne)
+        dnedx = self.geom.cnt_diff(Plasma_1d.ne)
         self.fluxe = -self.De*dnedx
-        dnidx = self.geom.cnt_diff(CCP_1d.ni)
+        dnidx = self.geom.cnt_diff(Plasma_1d.ni)
         self.fluxi = -self.Di*dnidx
         # self.bndy_flux()
 
@@ -118,7 +118,7 @@ class Ambipolar(DD_Base):
     Output: Flux, E-field
     """
 
-    def calc_ambi(self, CCP_1d):
+    def calc_ambi(self, Plasma_1d):
         """
         Calc ambipolar diffusion coefficient.
 
@@ -132,17 +132,17 @@ class Ambipolar(DD_Base):
         Da = Di(1 + Te/Ti).
         Ea = (Di - De)/(Mui + Mue)*dn/dx/n
         Orginal Ambipolar Coeff Da = (De*Mui + Di*Mue)/(Mue + Mui)
-        self.Da = (CCP_1d.De*CCP_1d.Mui + CCP_1d.Di*CCP_1d.Mue) / \
-                  (CCP_1d.Mue + CCP_1d.Mui)
+        self.Da = (Plasma_1d.De*Plasma_1d.Mui + Plasma_1d.Di*Plasma_1d.Mue) / \
+                  (Plasma_1d.Mue + Plasma_1d.Mui)
         Assume Te >> Ti, Ambipolar Coeff can be simplified as
         Da = Di(1 + Te/Ti).
         """
-        self.calc_transp(CCP_1d)
-        self.Da = self.Di*(1 + CCP_1d.Te / CCP_1d.Ti)
+        self.calc_transp(Plasma_1d)
+        self.Da = self.Di*(1 + Plasma_1d.Te / Plasma_1d.Ti)
         self.Ea = (self.Di - self.De)/(self.Mui + self.Mue)
-        dnidx = self.geom.cnt_diff(CCP_1d.ni)
-        self.Ea *= np.divide(dnidx, CCP_1d.ni,
-                             out=np.zeros_like(dnidx), where=CCP_1d.ni != 0)
+        dnidx = self.geom.cnt_diff(Plasma_1d.ni)
+        self.Ea *= np.divide(dnidx, Plasma_1d.ni,
+                             out=np.zeros_like(dnidx), where=Plasma_1d.ni != 0)
         self.bndy_ambi()
 
     def bndy_ambi(self):
@@ -155,17 +155,17 @@ class Ambipolar(DD_Base):
         # self.Ea[1], self.Ea[-2] = self.Ea[2], self.Ea[-3]
         self.Da[0], self.Da[-1] = self.Da[1], self.Da[-2]
 
-    def calc_flux(self, CCP_1d):
+    def calc_flux(self, Plasma_1d):
         """Calc Ambipolar flux."""
-        self.calc_ambi(CCP_1d)
+        self.calc_ambi(Plasma_1d)
         self.De, self.Di = self.Da, self.Da
-        self.calc_diff(CCP_1d)
+        self.calc_diff(Plasma_1d)
         self.fluxe = copy.deepcopy(self.fluxi)
         return self.fluxe, self.fluxi
 
-    def calc_ne(self, CCP_1d):
+    def calc_ne(self, Plasma_1d):
         """Calc ne = sum(ni), ensure charge neutrality."""
-        return copy.deepcopy(CCP_1d.ni)
+        return copy.deepcopy(Plasma_1d.ni)
 
 
 class Diffusion(DD_Base):
@@ -176,10 +176,10 @@ class Diffusion(DD_Base):
     They diffuse independently.
     """
 
-    def calc_flux(self, CCP_1d):
+    def calc_flux(self, Plasma_1d):
         """Calc diffusion coeff."""
-        self.calc_transp(CCP_1d)
-        self.calc_diff(CCP_1d)
+        self.calc_transp(Plasma_1d)
+        self.calc_diff(Plasma_1d)
         return self.fluxe, self.fluxi
 
 
@@ -187,7 +187,7 @@ class Drift_Diff(DD_Base):
     pass
     """Define Drift-Diffusion Physics."""
 
-    def calc_flux(self, CCP_1d):
+    def calc_flux(self, Plasma_1d):
         """
         Calc plasma flux.
 
@@ -199,20 +199,20 @@ class Drift_Diff(DD_Base):
 if __name__ == '__main__':
     """Test the Ambipolar."""
     from Mesh import Mesh_1d
-    from CCP1d import CCP_1d
-    mesh1d = Mesh_1d('CCP_1d', 10e-2, nx=11)
+    from Plasma1d import Plasma_1d
+    mesh1d = Mesh_1d('Plasma_1d', 10e-2, nx=11)
     print(mesh1d)
-    ccp1d = CCP_1d(mesh1d)
-    ccp1d.init_plasma()
-    # ccp1d.plot_plasma()
-    ccp1d.init_pot()
-    # ccp1d.plot_pot()
+    Plasma1d = Plasma_1d(mesh1d)
+    Plasma1d.init_plasma()
+    # Plasma1d.plot_plasma()
+    Plasma1d.init_pot()
+    # Plasma1d.plot_pot()
     ambi = Ambipolar(mesh1d)
     # diff = Diffusion(mesh1d)
     # ambi.plot_transp()
-    ccp1d.fluxe, ccp1d.fluxi = ambi.calc_flux(ccp1d)
-    # ccp1d.fluxe, ccp1d.fluxi = diff.calc_flux(ccp1d)
+    Plasma1d.fluxe, Plasma1d.fluxi = ambi.calc_flux(Plasma1d)
+    # Plasma1d.fluxe, Plasma1d.fluxi = diff.calc_flux(Plasma1d)
     ambi.plot_transp()
     # diff.plot_transp()
-    print(ccp1d.fluxe)
+    print(Plasma1d.fluxe)
     # print(ambi.__dict__)

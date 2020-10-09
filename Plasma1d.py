@@ -1,8 +1,8 @@
 """
-Define CCP_1d.
+Define Plasma_1d.
 
-CCP_1d plasma model.
-CCP_1d contains:
+Plasma_1d plasma model.
+Plasma_1d contains:
     density, flux, potential, E-field
 """
 
@@ -12,14 +12,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class CCP_1d(object):
-    """Define 1d CCP."""
+class Plasma_1d(object):
+    """Define 1d Plasma."""
 
     def __init__(self, geom):
         """
-        CCP_1d is defined as a container.
+        Plasma_1d is defined as a container.
 
-        CCP_1d as a basket containing:
+        Plasma_1d as a basket containing:
             geometry
             physics.
         """
@@ -27,7 +27,7 @@ class CCP_1d(object):
 
     def __str__(self):
         """Print 1d mesh information."""
-        res = 'CCP_1d:'
+        res = 'Plasma_1d:'
         return res
 
     def init_plasma(self, ne=1e17, nn=3.3e20, Te=1, Ti=0.1, Se=1e20):
@@ -127,7 +127,7 @@ class CCP_1d(object):
 
     def den_evolve(self, delt):
         """
-        Evolve the density in CCP by solving the continuity equation.
+        Evolve the density in Plasma by solving the continuity equation.
 
         dn/dt = -dFlux/dx + Se
         dn(t + dt) = dn(t) - dFlux/dx*dt + Se*dt
@@ -139,15 +139,15 @@ class CCP_1d(object):
 
 
 if __name__ == '__main__':
-    """Test CCP_1d."""
+    """Test Plasma_1d."""
     from Drift_Diff import Ambipolar, Diffusion
-    mesh1d = Mesh_1d('CCP_1d', 10e-2, nx=51)
+    mesh1d = Mesh_1d('Plasma_1d', 10e-2, nx=51)
     print(mesh1d)
-    ccp1d = CCP_1d(mesh1d)
-    ccp1d.init_plasma()
-    ccp1d.plot_plasma()
-    ccp1d.init_pot()
-    # ccp1d.plot_pot()
+    Plasma1d = Plasma_1d(mesh1d)
+    Plasma1d.init_plasma()
+    Plasma1d.plot_plasma()
+    Plasma1d.init_pot()
+    # Plasma1d.plot_pot()
     ambi = Ambipolar(mesh1d)
     # diff = Diffusion(mesh1d)
     ne_ave, ni_ave = [], []
@@ -155,13 +155,13 @@ if __name__ == '__main__':
     dt = 1e-6
     niter = 10000
     for itn in range(niter):
-        ccp1d.fluxe, ccp1d.fluxi = ambi.calc_flux(ccp1d)
-        # ccp1d.fluxe, ccp1d.fluxi = diff.calc_flux(ccp1d)
-        ccp1d.den_evolve(dt)
-        ccp1d.bndy_plasma()
-        ccp1d.limit_plasma()
-        ne_ave.append(np.mean(ccp1d.ne))
-        ni_ave.append(np.mean(ccp1d.ni))
+        Plasma1d.fluxe, Plasma1d.fluxi = ambi.calc_flux(Plasma1d)
+        # Plasma1d.fluxe, Plasma1d.fluxi = diff.calc_flux(Plasma1d)
+        Plasma1d.den_evolve(dt)
+        Plasma1d.bndy_plasma()
+        Plasma1d.limit_plasma()
+        ne_ave.append(np.mean(Plasma1d.ne))
+        ni_ave.append(np.mean(Plasma1d.ni))
         time.append(dt*(niter+1))
         if not (itn+1) % (niter/10):
-            ccp1d.plot_plasma()
+            Plasma1d.plot_plasma()
