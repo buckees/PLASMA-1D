@@ -21,7 +21,15 @@ from copy import deepcopy
 
 class Transp_1d(object):
     """Define the base tranport module/object."""
-
+    
+    def __init__(self, pla):
+        """Import geometry information."""
+        nx = pla.geom.nx
+        self.fluxe = np.zeros(nx)  # initial eon flux
+        self.fluxi = np.zeros(nx)  # initial ion flux
+        self.dfluxe = np.zeros(nx)  # initial eon flux
+        self.dfluxi = np.zeros(nx)  # initial ion flux
+        
     def __str__(self):
         """Print Transport Module."""
         return f'label = {self.dfluxe}'
@@ -87,6 +95,29 @@ class Transp_1d(object):
         ax.legend(['e Mobility', 'Ion Mobility'])
         # show fig
         plt.show(fig)
+    
+    def plot_flux(self, pla):
+        """
+        Plot flux and dflux.
+        
+        pla: Plasma_1d object
+            use pla.geom.x for plot
+        """
+        x = pla.geom.x
+        fig, axes = plt.subplots(1, 2, figsize=(8, 4),
+                                 constrained_layout=True)
+        # plot potential
+        ax = axes[0]
+        ax.plot(x, self.fluxe, 'bo-')
+        ax.plot(x, self.fluxi, 'ro-')
+        ax.legend(['e flux', 'Ion flux'])
+        # plot E-field
+        ax = axes[1]
+        ax.plot(x, self.dfluxe, 'bo-')
+        ax.plot(x, self.dfluxi, 'ro-')
+        ax.legend(['e dflux', 'Ion dflux'])
+        # show fig
+        plt.show(fig)
 
     # def calc_diff(self, Plasma_1d):
     #     """Calc diffusion term in flux."""
@@ -101,7 +132,7 @@ class Transp_1d(object):
     #     self.fluxe[1], self.fluxe[-2] = 2*self.fluxe[2], 2*self.fluxe[-3]
     #     self.fluxi[1], self.fluxi[-2] = 2*self.fluxi[2], 2*self.fluxi[-3]
 
-class Diff(Transp_1d):
+class Diff_1d(Transp_1d):
     """
     Calc the dflux for Diffusion Only Module.
     
@@ -112,13 +143,12 @@ class Diff(Transp_1d):
     def calc_diff(self, pla):
         """Calc diffusion term: D * d2n/dx2 and diffusion flux D * dn/dx. """
         # Calc 
-        self.fluxe = self.De * pla.geom.cnt_diff(pla.ne)
-        self.fluxi = self.Di * pla.geom.cnt_diff(pla.ni)
+        self.fluxe = -self.De * pla.geom.cnt_diff(pla.ne)
+        self.fluxi = -self.Di * pla.geom.cnt_diff(pla.ni)
         
-        self.dfluxe = , self.dfluxi
-        
-
-
+        self.dfluxe = -self.De * pla.geom.cnt_diff_2nd(pla.ne)
+        self.dfluxi = -self.Di * pla.geom.cnt_diff_2nd(pla.ni)
+    
 # class Ambipolar(DD_Base):
 #     """
 #     Define Ambipolar Physics.
@@ -214,7 +244,9 @@ if __name__ == '__main__':
     plasma1d = Plasma_1d(mesh1d)
     plasma1d.init_plasma()
     # Plasma1d.plot_plasma()
-    txp1d = Transp_1d(mesh1d)
+    txp1d = Diff_1d(plasma1d)
     txp1d.calc_transp_coeff(plasma1d)
     txp1d.plot_transp_coeff(plasma1d)
+    txp1d.calc_diff(plasma1d)
+    txp1d.plot_flux(plasma1d)
     
