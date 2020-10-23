@@ -7,6 +7,7 @@ Plasma_1d contains:
 """
 
 from Mesh import Mesh_1d
+from Constants import AMU
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -30,7 +31,7 @@ class Plasma_1d(object):
         res = 'Plasma_1d:'
         return res
 
-    def init_plasma(self, ne=1e17, press=10, Te=1, Ti=0.1):
+    def init_plasma(self, ne=1e17, press=10, Te=1, Ti=0.1, Mi=40):
         """
         Initiate plasma attributes.
 
@@ -47,6 +48,7 @@ class Plasma_1d(object):
                 coll_e,im = 1e7 at 10 mTorr
                             1e8 at 100 mTorr
                             1e9 at 1000 mTorr
+        Mi: kg, ion mass
         """
         nx = self.geom.nx
         self.ne = np.ones(nx)*ne  # init uniform ne on 1d mesh
@@ -57,6 +59,7 @@ class Plasma_1d(object):
         self.Ti = np.ones(nx)*Ti  # init ion temperature
         self.coll_em = np.ones(nx)*(press/10.0*1e7)  # eon coll freq (mom)
         self.coll_im = np.ones(nx)*(press/10.0*1e7)  # ion coll freq (mom)
+        self.Mi = Mi*AMU # ion mass 
         self.bndy_plasma()
         self.limit_plasma()
 
