@@ -12,6 +12,8 @@ Transp_1d contains:
     Output: dF/dx for continuity equation.
 """
 
+from Constants import KB_EV, EON_MASS, UNIT_CHARGE
+
 import numpy as np
 import matplotlib.pyplot as plt
 import copy
@@ -32,27 +34,22 @@ class Transp_1d(object):
         return f'label = {self.dfluxe}'
 
     # De/Di, Mue/Mui, initial values are not corret
-    def init_transp(self, pla):
+    def calc_transp_coeff(self, pla):
         """
         Initiate diffusion coefficient and mobility.
 
         pla: Plasma_1d object
-        v_coll: 1/s, coll freq (momentum)
-                v_coll = 1e7 at 10 mTorr
-                         1e8 at 100 mTorr
-                         1e9 at 1000 mTorr
-        initial De=5e-1, Di=5e-3, in m^2/s
-        initial Mue=1.0, Mui=1e-4 in (m/s)*(m/V)
+             calc uses pla.Te,i and pla.coll_em
+        De,i: m^2/s, D = k*T/(m*coll_m)
+        Mue,i: m^2/(V*s), Mu = q/(m*coll_m)
         """
-        nx = self.geom.nx
-        self.v_coll = np.ones(nx)*(pla.press/10.0*1e7)
-        self.De = np.ones(nx)*De  # initial eon diff coeff
-        self.Di = np.ones_like(self.De)*Di  # initial ion diff coeff
-        self.Mue = np.ones(nx)*Mue  # initial eon mobility
-        self.Mui = np.ones_like(self.Mue)*Mui  # initial ion mobility
-        self.bndy_transp()
-        self.limit_transp()
-
+        # calc diff coeff: D = k*T/(m*coll_m)
+        self.De = np.divide(KB_EV*pla.Te, EON_MASS*pla.coll_em)  
+        self.Di = np.divide(KB_EV*pla.Ti, pla.Mi*pla.coll_im)  
+        # calc mobility: Mu = q/(m*coll_m)
+        self.Mue = UNIT_CHARGE/EON_MASS/pla.coll_em
+        self.Mui = UNIT_CHARGE/pla.Mi/pla.coll_em
+        
     def bndy_transp(self):
         """
         Impose b.c. on transport coeff.
@@ -92,19 +89,6 @@ class Transp_1d(object):
         ax.legend(['e Mobility', 'Ion Mobility'])
         # show fig
         plt.show(fig)
-
-    def calc_transp(self, Plasma1d):
-        """
-        Calc transport coeff.
-
-        Calc diffusion coeff
-        Calc mobility
-        output: diffusion coeff and mobility
-        """
-        self.init_transp()
-        # self.De =
-        # self.Di =
-        pass
 
     def calc_diff(self, Plasma_1d):
         """Calc diffusion term in flux."""
