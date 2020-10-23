@@ -147,28 +147,32 @@ class Plasma_1d(object):
 
 if __name__ == '__main__':
     """Test Plasma_1d."""
-    from Drift_Diff import Ambipolar, Diffusion
+    from Transp1d import Diff_1d
+    from React1d import React_1d
     mesh1d = Mesh_1d('Plasma_1d', 10e-2, nx=51)
     print(mesh1d)
-    Plasma1d = Plasma_1d(mesh1d)
-    Plasma1d.init_plasma()
-    Plasma1d.plot_plasma()
-    Plasma1d.init_pot()
-    # Plasma1d.plot_pot()
-    ambi = Ambipolar(mesh1d)
-    # diff = Diffusion(mesh1d)
+    pla1d = Plasma_1d(mesh1d)
+    pla1d.init_plasma()
+    pla1d.plot_plasma()
+    # calc the transport 
+    txp1d = Diff_1d(pla1d)
+    txp1d.calc_transp_coeff(pla1d)
+    txp1d.plot_transp_coeff(pla1d)
+    # calc source term
+    src1d = React_1d(pla1d)
+    #
     ne_ave, ni_ave = [], []
     time = []
-    dt = 1e-6
-    niter = 10000
+    dt = 1e-11
+    niter = 3000
     for itn in range(niter):
-        Plasma1d.fluxe, Plasma1d.fluxi = ambi.calc_flux(Plasma1d)
-        # Plasma1d.fluxe, Plasma1d.fluxi = diff.calc_flux(Plasma1d)
-        Plasma1d.den_evolve(dt)
-        Plasma1d.bndy_plasma()
-        Plasma1d.limit_plasma()
-        ne_ave.append(np.mean(Plasma1d.ne))
-        ni_ave.append(np.mean(Plasma1d.ni))
+        txp1d.calc_diff(pla1d)
+        pla1d.den_evolve(dt, txp1d, src1d)
+        pla1d.bndy_plasma()
+        pla1d.limit_plasma()
+        ne_ave.append(np.mean(pla1d.ne))
+        ni_ave.append(np.mean(pla1d.ni))
         time.append(dt*(niter+1))
         if not (itn+1) % (niter/10):
-            Plasma1d.plot_plasma()
+            txp1d.plot_flux(pla1d)
+            pla1d.plot_plasma()
