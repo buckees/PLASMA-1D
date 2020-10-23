@@ -24,7 +24,7 @@ class Plasma_1d(object):
             geometry
             physics.
         """
-        self.geom = geom
+        self.geom = copy.deepcopy(geom)
 
     def __str__(self):
         """Print 1d mesh information."""
