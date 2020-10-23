@@ -43,7 +43,7 @@ class Plasma_1d(object):
             At 1 mTorr, number density = 3.3e19 m^-3.
         Te: eV, eon temperature
         Ti: eV, ion temperature
-        colle: 1/s, eon coll freq (momentum)
+        coll_em: 1/s, eon coll freq (momentum)
                 colle = 1e7 at 10 mTorr
                         1e8 at 100 mTorr
                         1e9 at 1000 mTorr
@@ -55,7 +55,7 @@ class Plasma_1d(object):
         self.press = press
         self.Te = np.ones(nx)*Te  # init eon temperature
         self.Ti = np.ones(nx)*Ti  # init ion temperature
-        self.colle = np.ones(nx)*(press/10.0*1e7)  # eon coll freq (mom)
+        self.coll_em = np.ones(nx)*(press/10.0*1e7)  # eon coll freq (mom)
         self.bndy_plasma()
         self.limit_plasma()
 
@@ -66,7 +66,7 @@ class Plasma_1d(object):
         self.nn[0], self.nn[-1] = 1e11, 1e11
         self.Te[0], self.Te[-1] = 0.1, 0.1
         self.Ti[0], self.Ti[-1] = 0.01, 0.01
-        self.colle[0], self.colle[-1] = 1.0, 1.0
+        self.coll_em[0], self.coll_em[-1] = 1.0, 1.0
 
     def limit_plasma(self, n_min=1e11, n_max=1e22, T_min=0.001, T_max=100.0):
         """Limit variables in the plasma."""
