@@ -10,7 +10,7 @@ from Geometry import Geom_1d
 
 import numpy as np
 import matplotlib.pyplot as plt
-
+from copy import deepcopy
 
 class Mesh_1d(Geom_1d):
     """Define 1d Mesh."""
@@ -61,7 +61,7 @@ class Mesh_1d(Geom_1d):
         # dy[0] = dy[1]; dy[-1] = dy[-2]
         for i in range(1, self.nx-1):
             dy[i] = (y[i+1] - y[i-1])/self.delx/2.0
-        dy[0], dy[-1] = dy[1], dy[-2]
+        dy[0], dy[-1] = deepcopy(dy[1]), deepcopy(dy[-2])
         return dy
     
     def cnt_diff_2nd(self, y):
@@ -79,7 +79,7 @@ class Mesh_1d(Geom_1d):
         # d2y[0] = d2y[1]; d2y[-1] = d2y[-2]
         for i in range(1, self.nx-1):
             d2y[i] = (y[i+1] - 2 * y[i] + y[i-1])/self.delx**2
-        d2y[0], d2y[-1] = d2y[1], d2y[-2]
+        d2y[0], d2y[-1] = deepcopy(d2y[1]), deepcopy(d2y[-2])
         return d2y
 
 
