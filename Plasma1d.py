@@ -1,9 +1,9 @@
 """
-Define Plasma_1d.
+1D Plasma Module - Main Module
 
-Plasma_1d plasma model.
 Plasma_1d contains:
-    density, flux, potential, E-field
+    density: update using explicit method, integrating by delt
+    temperature: copy from energy module    
 """
 
 from Mesh import Mesh_1d
