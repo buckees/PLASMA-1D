@@ -30,7 +30,7 @@ class Plasma_1d(object):
         res = 'Plasma_1d:'
         return res
 
-    def init_plasma(self, ne=1e17, nn=3.3e20, Te=1, Ti=0.1, Se=1e20):
+    def init_plasma(self, ne=1e17, nn=3.3e20, Te=1, Ti=0.1):
         """
         Initiate plasma attributes.
 
@@ -42,12 +42,8 @@ class Plasma_1d(object):
         self.ne = np.ones(nx)*ne  # initial uniform ne on 1d mesh
         self.ni = np.ones_like(self.ne)*ne  # initial ni to neutralize ne
         self.nn = np.ones_like(self.ne)*nn  # initial neutral density
-        self.fluxe = np.zeros_like(self.ne)  # initial eon flux
-        self.fluxi = np.zeros_like(self.ne)  # initial ion flux
         self.Te = np.ones_like(self.ne)*Te  # initial eon temperature
         self.Ti = np.ones_like(self.ne)*Ti  # initial ion temperature
-        self.Se = np.ones_like(self.ne)*Se  # initial e source term
-        self.Si = np.ones_like(self.ne)*Se  # initial ion source term
         self.bndy_plasma()
         self.limit_plasma()
 
@@ -58,8 +54,6 @@ class Plasma_1d(object):
         self.nn[0], self.nn[-1] = 0.0, 0.0
         self.Te[0], self.Te[-1] = 0.0, 0.0
         self.Ti[0], self.Ti[-1] = 0.0, 0.0
-        self.Se[0], self.Se[-1] = 0.0, 0.0
-        self.Si[0], self.Si[-1] = 0.0, 0.0
 
     def limit_plasma(self, n_min=1e11, n_max=1e22, T_min=0.001, T_max=100.0):
         """Limit variables in the plasma."""
@@ -76,7 +70,7 @@ class Plasma_1d(object):
         density, flux, temperature
         """
         x = self.geom.x
-        fig, axes = plt.subplots(1, 3, figsize=(12, 3),
+        fig, axes = plt.subplots(1, 2, figsize=(8, 3),
                                  constrained_layout=True)
         # plot densities
         ax = axes[0]
@@ -85,15 +79,8 @@ class Plasma_1d(object):
         ax.legend(['E', 'Ion'])
         ax.set_xlabel('Position (m)')
         ax.set_ylabel('Density (m^-3)')
-        # plot fluxes
-        ax = axes[1]
-        ax.plot(x, self.fluxe, 'b-')
-        ax.plot(x, self.fluxi, 'r-')
-        ax.legend(['flux E', 'flux Ion'])
-        ax.set_xlabel('Position (m)')
-        ax.set_ylabel('Flux (m^-2s^-1)')
         # plot temperature
-        ax = axes[2]
+        ax = axes[1]
         ax.plot(x, self.Te, 'b-')
         ax.plot(x, self.Ti, 'r-')
         ax.legend(['Te', 'Ti'])
@@ -125,17 +112,18 @@ class Plasma_1d(object):
         # show fig
         plt.show(fig)
 
-    def den_evolve(self, delt):
+    def den_evolve(self, delt, txp, src):
         """
         Evolve the density in Plasma by solving the continuity equation.
 
         dn/dt = -dFlux/dx + Se
         dn(t + dt) = dn(t) - dFlux/dx*dt + Se*dt
+        delt: time step for explict method
+        txp: object for transport module
+        src: object for reaction module
         """
-        dfluxe = self.geom.cnt_diff(self.fluxe)
-        self.ne -= dfluxe*delt
-        dfluxi = self.geom.cnt_diff(self.fluxi)
-        self.ni -= dfluxi*delt
+        self.ne += (-txp.dfluxe + src.se)*delt
+        self.ni += (-txp.dfluxi + src.si)*delt
 
 
 if __name__ == '__main__':
