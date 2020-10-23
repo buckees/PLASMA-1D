@@ -30,20 +30,27 @@ class Plasma_1d(object):
         res = 'Plasma_1d:'
         return res
 
-    def init_plasma(self, ne=1e17, nn=3.3e20, Te=1, Ti=0.1):
+    def init_plasma(self, ne=1e17, press=10, Te=1, Ti=0.1):
         """
         Initiate plasma attributes.
 
-        At 1 atm, number density = 0.025e27 m^-3.
-        At 1 Torr, number density = 3.3e22 m^-3.
-        At 1 mTorr, number density = 3.3e19 m^-3.
+        ne: 1/m^3, eon denisty
+        ni: 1/m^3, ion density = eon density initially
+        press: mTorr, pressure
+        nn: 1/m^3, neutral density determined by pressure
+            At 1 atm, number density = 0.025e27 m^-3.
+            At 1 Torr, number density = 3.3e22 m^-3.
+            At 1 mTorr, number density = 3.3e19 m^-3.
+        Te: eV, eon temperature
+        Ti: eV, ion temperature
         """
         nx = self.geom.nx
-        self.ne = np.ones(nx)*ne  # initial uniform ne on 1d mesh
-        self.ni = np.ones_like(self.ne)*ne  # initial ni to neutralize ne
-        self.nn = np.ones_like(self.ne)*nn  # initial neutral density
-        self.Te = np.ones_like(self.ne)*Te  # initial eon temperature
-        self.Ti = np.ones_like(self.ne)*Ti  # initial ion temperature
+        self.ne = np.ones(nx)*ne  # init uniform ne on 1d mesh
+        self.ni = np.ones_like(self.ne)*ne  # init ni to neutralize ne
+        self.nn = np.ones_like(self.ne)*(press*3.3e19)  # init neutral density
+        self.press = press
+        self.Te = np.ones_like(self.ne)*Te  # init eon temperature
+        self.Ti = np.ones_like(self.ne)*Ti  # init ion temperature
         self.bndy_plasma()
         self.limit_plasma()
 
