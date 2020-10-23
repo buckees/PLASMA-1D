@@ -52,14 +52,15 @@ class Mesh_1d(Geom_1d):
 
         Using x[i+1] - x[i-1] instead of delx makes cnt_diff() compatible
         with non-uniform 1d mesh.
+        output: dy/dx
         """
         dy = np.zeros_like(self.x)
         # Although dy[0] and dy[-1] are signed here,
         # they are eventually specified in boundary conditions
-        dy[0] = (y[1] - y[0])/(self.x[1] - self.x[0])
-        dy[-1] = (y[-1] - y[-2])/(self.x[-1] - self.x[-2])
+        # dy[0] = dy[1]; dy[-1] = dy[-2]
         for i in range(1, self.nx-1):
             dy[i] = (y[i+1] - y[i-1])/(self.x[i+1] - self.x[i-1])
+        dy[0], dy[-1] = dy[1], dy[-2]
         return dy
 
 
