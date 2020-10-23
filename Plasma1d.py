@@ -11,6 +11,7 @@ from Constants import AMU
 
 import numpy as np
 import matplotlib.pyplot as plt
+from copy import deepcopy
 
 
 class Plasma_1d(object):
@@ -24,7 +25,7 @@ class Plasma_1d(object):
             geometry
             physics.
         """
-        self.geom = copy.deepcopy(geom)
+        self.geom = deepcopy(geom)
 
     def __str__(self):
         """Print 1d mesh information."""
@@ -70,8 +71,8 @@ class Plasma_1d(object):
         self.nn[0], self.nn[-1] = 1e11, 1e11
         self.Te[0], self.Te[-1] = 0.1, 0.1
         self.Ti[0], self.Ti[-1] = 0.01, 0.01
-        self.coll_em[0], self.coll_em[-1] = 1e5, 1e5
-        self.coll_im[0], self.coll_im[-1] = 1e5, 1e5
+        # self.coll_em[0], self.coll_em[-1] = 1e5, 1e5
+        # self.coll_im[0], self.coll_im[-1] = 1e5, 1e5
 
     def limit_plasma(self, n_min=1e11, n_max=1e22, T_min=0.001, T_max=100.0):
         """Limit variables in the plasma."""
