@@ -5,6 +5,7 @@ Transp_1d contains:
     Diffusion only
     Ambipolar
     Drfit-Diffusion
+    Momentum Solver
 
     Continuity Eq. dn/dt = -dF/dx * dt + S * det
     Input: depends on transport mode
@@ -16,29 +17,35 @@ import matplotlib.pyplot as plt
 import copy
 
 
-class DD_Base():
-    """Define the base class for Drift-Diffusion and Ambipolar."""
+class Transp_1d(object):
+    """Define the base tranport module/object."""
 
     def __init__(self, geom):
         """Import geometry information."""
         self.geom = geom
         nx = self.geom.nx
-        self.fluxe = np.zeros(nx)  # initial eon flux
-        self.fluxi = np.zeros(nx)  # initial ion flux
+        self.dfluxe = np.zeros(nx)  # initial dfluxe/dx
+        self.dfluxi = np.zeros(nx)  # initial dfluxi/dx
 
     def __str__(self):
-        """Print Drift-Diffusion Approximation."""
-        return f'label = {self.fluxe}'
+        """Print Transport Module."""
+        return f'label = {self.dfluxe}'
 
     # De/Di, Mue/Mui, initial values are not corret
-    def init_transp(self, De=5e-1, Di=5e-3, Mue=1.0, Mui=1e-4):
+    def init_transp(self, pla):
         """
         Initiate diffusion coefficient and mobility.
 
+        pla: Plasma_1d object
+        v_coll: 1/s, coll freq (momentum)
+                v_coll = 1e7 at 10 mTorr
+                         1e8 at 100 mTorr
+                         1e9 at 1000 mTorr
         initial De=5e-1, Di=5e-3, in m^2/s
         initial Mue=1.0, Mui=1e-4 in (m/s)*(m/V)
         """
         nx = self.geom.nx
+        self.v_coll = np.ones(nx)*(pla.press/10.0*1e7)
         self.De = np.ones(nx)*De  # initial eon diff coeff
         self.Di = np.ones_like(self.De)*Di  # initial ion diff coeff
         self.Mue = np.ones(nx)*Mue  # initial eon mobility
