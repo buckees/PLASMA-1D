@@ -49,19 +49,38 @@ class Mesh_1d(Geom_1d):
     def cnt_diff(self, y):
         """
         Caculate dy/dx using central differencing.
-
-        Using x[i+1] - x[i-1] instead of delx makes cnt_diff() compatible
-        with non-uniform 1d mesh.
-        output: dy/dx
+        
+        input: y
+        dy/dx = (y[i+1] - y[i-1])/(2.0*dx)
+        dy[0] = dy[1]; dy[-1] = dy[-2]
+        output: dy
         """
         dy = np.zeros_like(self.x)
         # Although dy[0] and dy[-1] are signed here,
         # they are eventually specified in boundary conditions
         # dy[0] = dy[1]; dy[-1] = dy[-2]
         for i in range(1, self.nx-1):
-            dy[i] = (y[i+1] - y[i-1])/(self.x[i+1] - self.x[i-1])
+            dy[i] = (y[i+1] - y[i-1])/self.delx/2.0
         dy[0], dy[-1] = dy[1], dy[-2]
         return dy
+    
+    def cnt_diff_2nd(self, y):
+        """
+        Caculate d2y/dx2 using 2nd order central differencing.
+
+        input: y
+        d2y/dx2 = (y[i+1] - 2 * y[i] + y[i-1])/dx^2
+        d2y[0] = d2y[1]; d2y[-1] = d2y[-2]
+        output: d2y/dx2
+        """
+        d2y = np.zeros_like(self.x)
+        # Although dy[0] and dy[-1] are signed here,
+        # they are eventually specified in boundary conditions
+        # d2y[0] = d2y[1]; d2y[-1] = d2y[-2]
+        for i in range(1, self.nx-1):
+            d2y[i] = (y[i+1] - 2 * y[i] + y[i-1])/self.delx**2
+        d2y[0], d2y[-1] = d2y[1], d2y[-2]
+        return d2y
 
 
 if __name__ == '__main__':
