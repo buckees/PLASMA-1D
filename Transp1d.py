@@ -50,28 +50,6 @@ class Transp_1d(object):
         # calc mobility: Mu = q/(m*coll_m)
         self.Mue = UNIT_CHARGE/EON_MASS/pla.coll_em
         self.Mui = UNIT_CHARGE/pla.Mi/pla.coll_im
-        
-    # def bndy_transp(self):
-    #     """
-    #     Impose b.c. on transport coeff.
-
-    #     Extension b.c.
-    #     """
-    #     # self.De[0], self.De[-1] = 0.0, 0.0
-    #     # self.Di[0], self.Di[-1] = 0.0, 0.0
-    #     # self.Mue[0], self.Mue[-1] = 0.0, 0.0
-    #     # self.Mui[0], self.Mui[-1] = 0.0, 0.0
-    #     self.De[0], self.De[-1] = self.De[1], self.De[-2]
-    #     self.Di[0], self.Di[-1] = self.Di[1], self.Di[-2]
-    #     self.Mue[0], self.Mue[-1] = self.Mue[1], self.Mue[-2]
-    #     self.Mui[0], self.Mui[-1] = self.Mui[1], self.Mui[-2]
-
-    # def limit_transp(self, D_min=1e-6, D_max=1e3, M_min=1e-7, M_max=1e3):
-    #     """Limit variables in the plasma."""
-    #     self.De = np.clip(self.De, D_min, D_max)
-    #     self.Di = np.clip(self.Di, D_min, D_max)
-    #     self.Mue = np.clip(self.Mue, M_min, M_max)
-    #     self.Mui = np.clip(self.Mui, M_min, M_max)
 
     def plot_transp_coeff(self, pla):
         """
