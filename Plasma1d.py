@@ -147,7 +147,7 @@ class Plasma_1d(object):
 
 if __name__ == '__main__':
     """Test Plasma_1d."""
-    from Transp1d import Diff_1d
+    from Transp1d import Diff_1d, Ambi_1d
     from React1d import React_1d
     mesh1d = Mesh_1d('Plasma_1d', 10e-2, nx=51)
     print(mesh1d)
@@ -155,7 +155,7 @@ if __name__ == '__main__':
     pla1d.init_plasma()
     pla1d.plot_plasma()
     # calc the transport 
-    txp1d = Diff_1d(pla1d)
+    txp1d = Ambi_1d(pla1d)
     txp1d.calc_transp_coeff(pla1d)
     txp1d.plot_transp_coeff(pla1d)
     # calc source term
@@ -163,10 +163,10 @@ if __name__ == '__main__':
     #
     ne_ave, ni_ave = [], []
     time = []
-    dt = 1e-11
+    dt = 1e-6
     niter = 3000
     for itn in range(niter):
-        txp1d.calc_diff(pla1d)
+        txp1d.calc_ambi(pla1d)
         pla1d.den_evolve(dt, txp1d, src1d)
         pla1d.bndy_plasma()
         pla1d.limit_plasma()
