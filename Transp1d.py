@@ -184,7 +184,7 @@ class Ambi_1d(Transp_1d):
         self.calc_transp_coeff(pla)
         # Calc ambi coeff
         self.Da = self.Di*(1.0 + np.divide(pla.Te, pla.Ti))
-        dni = self.geom.cnt_diff(pla.ni)
+        dni = pla.geom.cnt_diff(pla.ni)
         self.Ea = np.divide(self.Di - self.De, self.Mui + self.Mue)
         self.Ea *= np.divide(dni, pla.ni)
         # Calc flux
