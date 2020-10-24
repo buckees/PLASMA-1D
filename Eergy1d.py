@@ -59,8 +59,8 @@ class Eergy_1d(object):
         self.Qe -= np.multiply(self.th_cond_e, self.dTe)
         self.dQe -= np.multiply(self.th_cond_e, self.d2Te)
         
-    def calc_Te(self, pla, power):
+    def calc_Te(self, delt, pla, pwr):
         """Calc Te"""
-        self.ergy_e += (-self.dQe + power.input)*delt
+        self.ergy_e += (-self.dQe + pwr.input)*delt
         self.Te = np.divide(self.ergy_e, self.Te)/1.5/KB_EV
 
