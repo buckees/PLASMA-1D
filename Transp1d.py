@@ -36,7 +36,7 @@ class Transp_1d(object):
 
     def calc_transp_coeff(self, pla):
         """
-        Initiate diffusion coefficient and mobility.
+        Calc diffusion coefficient and mobility.
 
         pla: Plasma_1d object
              calc uses pla.Te,i and pla.coll_em
