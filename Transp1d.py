@@ -151,7 +151,7 @@ class Diff_1d(Transp_1d):
         self.dfluxe = -self.De * pla.geom.cnt_diff_2nd(pla.ne)
         self.dfluxi = -self.Di * pla.geom.cnt_diff_2nd(pla.ni)
     
-class Ambipolar(Transp_1d):
+class Ambi_1d(Transp_1d):
     """
     Calc the dflux for Ambipolar Diffusion Module.
 
