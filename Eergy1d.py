@@ -21,8 +21,12 @@ class Eergy_1d(object):
     def __init__(self, pla):
         """Import Plasma1d information."""
         nx = pla.geom.nx
-        self.qfluxe = np.zeros(nx)  # initial eon flux
-        self.qdfluxe = np.zeros(nx)  # initial eon flux       
+        self.Qe = np.zeros(nx)  # initial eon flux
+        self.dQe = np.zeros(nx)  # initial eon flux
+        self.Te = deepcopy(pla.Te)
+        # eon energy = 3/2 * ne * kTe
+        self.ergy_e = 1.5*KB_EV*np.multiply(pla.ne, pla.Te)
+        
         
     def __str__(self):
         """Print eon energy module."""
@@ -39,7 +43,8 @@ class Eergy_1d(object):
         # calc thermal conductivity for eon
         self.th_cond_e = 1.0
     
-    def calc_Te(self, pla):
+    def calc_Te(self, pla, power):
         """Calc Te"""
-        
+        self.ergy_e += (-self.dQe + power.input)*delt
+        self.Te = np.divide(self.ergy_e, self.Te)/1.5/KB_EV
 
