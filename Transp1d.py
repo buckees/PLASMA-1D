@@ -34,7 +34,6 @@ class Transp_1d(object):
         """Print Transport Module."""
         return f'label = {self.dfluxe}'
 
-    # De/Di, Mue/Mui, initial values are not corret
     def calc_transp_coeff(self, pla):
         """
         Initiate diffusion coefficient and mobility.
