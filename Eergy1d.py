@@ -41,8 +41,24 @@ class Eergy_1d(object):
         heat_cond_e: W/m/K, heat conductivity for eon
         """
         # calc thermal conductivity for eon
-        self.th_cond_e = 1.0
+        self.th_cond_e = np.ones(pla.ne)*1.0
     
+    def calc_th_flux(self, pla, txp):
+        """
+        Calc eon thermal flux, Qe
+        
+        Qe = 5/2kTe * fluxe - ke * dTe/dx
+        dQe = 5/2kTe * dfluxe - ke * d2Te/dx2
+        """
+        # calc convection term
+        self.Qe = 2.5*KB_EV*np.multiply(self.Te, txp.fluxe)
+        self.dQe = 2.5*KB_EV*np.multiply(self.Te, txp.dfluxe)
+        # calc conduction term
+        self.dTe = pla.goem.cnt_diff(self.Te)
+        self.d2Te = pla.goem.cnt_diff_2nd(self.Te)
+        self.Qe -= np.multiply(self.th_cond_e, self.dTe)
+        self.dQe -= np.multiply(self.th_cond_e, self.d2Te)
+        
     def calc_Te(self, pla, power):
         """Calc Te"""
         self.ergy_e += (-self.dQe + power.input)*delt
