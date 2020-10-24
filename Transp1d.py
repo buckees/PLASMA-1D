@@ -142,47 +142,58 @@ class Diff_1d(Transp_1d):
     """
     def calc_diff(self, pla):
         """Calc diffusion term: D * d2n/dx2 and diffusion flux D * dn/dx. """
-        # Calc 
+        # Calc transp coeff first
+        self.calc_transp_coeff(pla)
+        # Calc flux
         self.fluxe = -self.De * pla.geom.cnt_diff(pla.ne)
         self.fluxi = -self.Di * pla.geom.cnt_diff(pla.ni)
-        
+        # Calc dflux
         self.dfluxe = -self.De * pla.geom.cnt_diff_2nd(pla.ne)
         self.dfluxi = -self.Di * pla.geom.cnt_diff_2nd(pla.ni)
     
-# class Ambipolar(DD_Base):
-#     """
-#     Define Ambipolar Physics.
+class Ambipolar(Transp_1d):
+    """
+    Calc the dflux for Ambipolar Diffusion Module.
 
-#     Input: Geometry, Te/Ti, ne/ni
-#     Output: Flux, E-field
-#     """
+    dn/dt = -Da * d2n/dx2 + Se
+    Di: m^2/s, ion diffusion coefficient is calc from Tranps_1d
+    Da = Di(1 + Te/Ti).
+    Output: Da * d2n/dx2 and E-field
+    """
 
-#     def calc_ambi(self, Plasma_1d):
-#         """
-#         Calc ambipolar diffusion coefficient.
+    def calc_ambi(self, pla):
+        """
+        Calc ambipolar diffusion coefficient.
 
-#         The ambipolar diffusion assumptions:
-#             1. steady state, dne/dt = 0. it cannot be used to
-#             describe plasma decay.
-#             2. ni is calculated from continuity equation.
-#             3. plasma is charge neutral, ne = ni
-#             4. Ionization Se is needed to balance diffusion loss.
-#         Da = (De*Mui + Di*Mue)/(Mue + Mui)
-#         Da = Di(1 + Te/Ti).
-#         Ea = (Di - De)/(Mui + Mue)*dn/dx/n
-#         Orginal Ambipolar Coeff Da = (De*Mui + Di*Mue)/(Mue + Mui)
-#         self.Da = (Plasma_1d.De*Plasma_1d.Mui + Plasma_1d.Di*Plasma_1d.Mue) / \
-#                   (Plasma_1d.Mue + Plasma_1d.Mui)
-#         Assume Te >> Ti, Ambipolar Coeff can be simplified as
-#         Da = Di(1 + Te/Ti).
-#         """
-#         self.calc_transp(Plasma_1d)
-#         self.Da = self.Di*(1 + Plasma_1d.Te / Plasma_1d.Ti)
-#         self.Ea = (self.Di - self.De)/(self.Mui + self.Mue)
-#         dnidx = self.geom.cnt_diff(Plasma_1d.ni)
-#         self.Ea *= np.divide(dnidx, Plasma_1d.ni,
-#                              out=np.zeros_like(dnidx), where=Plasma_1d.ni != 0)
-#         self.bndy_ambi()
+        The ambipolar diffusion assumptions:
+            1. steady state, dne/dt = 0. it cannot be used to
+            describe plasma decay.
+            2. ni is calculated from continuity equation.
+            3. plasma is charge neutral, ne = ni
+            4. Ionization Se is needed to balance diffusion loss.
+        Da = (De*Mui + Di*Mue)/(Mue + Mui)
+        Da = Di(1 + Te/Ti).
+        Ea = (Di - De)/(Mui + Mue)*dn/dx/n
+        Orginal Ambipolar Coeff Da = (De*Mui + Di*Mue)/(Mue + Mui)
+        self.Da = (Plasma_1d.De*Plasma_1d.Mui + Plasma_1d.Di*Plasma_1d.Mue) / \
+                  (Plasma_1d.Mue + Plasma_1d.Mui)
+        Assume Te >> Ti, Ambipolar Coeff can be simplified as
+        Da = Di(1 + Te/Ti).
+        """
+        # Calc transp coeff first
+        self.calc_transp_coeff(pla)
+        # Calc ambi coeff
+        self.Da = self.Di*(1.0 + np.divide(pla.Te, pla.Ti))
+        dni = self.geom.cnt_diff(pla.ni)
+        self.Ea = np.divide(self.Di - self.De, self.Mui + self.Mue)
+        self.Ea *= np.divide(dni, pla.ni)
+        # Calc flux
+        self.fluxe = -self.Da * pla.geom.cnt_diff(pla.ne)
+        self.fluxi = -self.Da * pla.geom.cnt_diff(pla.ni)
+        # Calc dflux
+        self.dfluxe = -self.Da * pla.geom.cnt_diff_2nd(pla.ne)
+        self.dfluxi = -self.Da * pla.geom.cnt_diff_2nd(pla.ni)
+        # self.bndy_ambi()
 
 #     def bndy_ambi(self):
 #         """
