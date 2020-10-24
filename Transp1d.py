@@ -119,19 +119,6 @@ class Transp_1d(object):
         # show fig
         plt.show(fig)
 
-    # def calc_diff(self, Plasma_1d):
-    #     """Calc diffusion term in flux."""
-    #     dnedx = self.geom.cnt_diff(Plasma_1d.ne)
-    #     self.fluxe = -self.De*dnedx
-    #     dnidx = self.geom.cnt_diff(Plasma_1d.ni)
-    #     self.fluxi = -self.Di*dnidx
-    #     # self.bndy_flux()
-
-    # def bndy_flux(self):
-    #     """Impose b.c. to flux."""
-    #     self.fluxe[1], self.fluxe[-2] = 2*self.fluxe[2], 2*self.fluxe[-3]
-    #     self.fluxi[1], self.fluxi[-2] = 2*self.fluxi[2], 2*self.fluxi[-3]
-
 class Diff_1d(Transp_1d):
     """
     Calc the dflux for Diffusion Only Module.
@@ -194,56 +181,6 @@ class Ambi_1d(Transp_1d):
         self.dfluxe = -self.Da * pla.geom.cnt_diff_2nd(pla.ne)
         self.dfluxi = -self.Da * pla.geom.cnt_diff_2nd(pla.ni)
         # self.bndy_ambi()
-
-#     def bndy_ambi(self):
-#         """
-#         Impose b.c. to Ea.
-
-#         Extension b.c.
-#         """
-#         self.Ea[0], self.Ea[-1] = self.Ea[1], self.Ea[-2]
-#         # self.Ea[1], self.Ea[-2] = self.Ea[2], self.Ea[-3]
-#         self.Da[0], self.Da[-1] = self.Da[1], self.Da[-2]
-
-#     def calc_flux(self, Plasma_1d):
-#         """Calc Ambipolar flux."""
-#         self.calc_ambi(Plasma_1d)
-#         self.De, self.Di = self.Da, self.Da
-#         self.calc_diff(Plasma_1d)
-#         self.fluxe = copy.deepcopy(self.fluxi)
-#         return self.fluxe, self.fluxi
-
-#     def calc_ne(self, Plasma_1d):
-#         """Calc ne = sum(ni), ensure charge neutrality."""
-#         return copy.deepcopy(Plasma_1d.ni)
-
-
-# class Diffusion(DD_Base):
-#     """
-#     Diffusion only.
-
-#     No interactions between electrons and ions.
-#     They diffuse independently.
-#     """
-
-#     def calc_flux(self, Plasma_1d):
-#         """Calc diffusion coeff."""
-#         self.calc_transp(Plasma_1d)
-#         self.calc_diff(Plasma_1d)
-#         return self.fluxe, self.fluxi
-
-
-# class Drift_Diff(DD_Base):
-#     pass
-#     """Define Drift-Diffusion Physics."""
-
-#     def calc_flux(self, Plasma_1d):
-#         """
-#         Calc plasma flux.
-
-#         The drift-diffusion approximation:
-#         """
-#         pass
 
 
 if __name__ == '__main__':
