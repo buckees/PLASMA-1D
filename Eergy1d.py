@@ -64,3 +64,22 @@ class Eergy_1d(object):
         self.ergy_e += (-self.dQe + pwr.input)*delt
         self.Te = np.divide(self.ergy_e, self.Te)/1.5/KB_EV
 
+    def plot_Te(self, pla):
+        """
+        Plot eon temperature.
+        
+        pla: Plasma_1d object
+            use pla.geom.x for plot
+        """
+        x = pla.geom.x
+        fig, axes = plt.subplots(1, 2, figsize=(8, 4),
+                                 constrained_layout=True)
+        # plot eon temperature
+        ax = axes[0]
+        ax.plot(x, self.Te, 'bo-')
+        ax.legend(['e Temperature'])
+        #
+        ax.plot(x, self.Te, 'bo-')
+        ax.legend(['e Temperature'])
+        plt.show()
+        
