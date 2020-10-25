@@ -105,7 +105,6 @@ class Plasma_1d(object):
         ax.legend(['Te', 'Ti'])
         ax.set_xlabel('Position (m)')
         ax.set_ylabel('Temperature (eV)')
-        # show fig
         plt.show()
 
     def init_pot(self, phi=0.0):
@@ -128,7 +127,6 @@ class Plasma_1d(object):
         ax = axes[1]
         ax.plot(x, self.ef, 'g-')
         ax.legend(['E-field'])
-        # show fig
         plt.show()
 
     def den_evolve(self, delt, txp, src):
