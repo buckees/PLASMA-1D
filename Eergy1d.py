@@ -41,7 +41,7 @@ class Eergy_1d(object):
         heat_cond_e: W/m/K, heat conductivity for eon
         """
         # calc thermal conductivity for eon
-        self.th_cond_e = np.ones(pla.ne)*1.0
+        self.th_cond_e = np.ones_like(pla.ne)*1.0
     
     def calc_th_flux(self, pla, txp):
         """
@@ -117,3 +117,13 @@ if __name__ == '__main__':
         if not (itn+1) % (niter/10):
             txp1d.plot_flux(pla1d)
             pla1d.plot_plasma()
+    # Test Eergy_1d
+    een1d = Eergy_1d(pla1d)
+    pwr1d = Power_1d(pla1d)
+    for itn in range(niter):
+        een1d.calc_th_cond_coeff(pla1d)
+        een1d.calc_th_flux(pla1d, txp1d)
+        een1d.calc_Te(dt, pla1d, pwr1d)
+        if not (itn+1) % (niter/10):
+            een1d.plot_Te(pla1d)
+            
