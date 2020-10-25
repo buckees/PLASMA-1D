@@ -124,8 +124,10 @@ if __name__ == '__main__':
         #     pla1d.plot_plasma()
     # Test Eergy_1d
     dt = 3e-7
+    niter = 100000
     een1d = Eergy_1d(pla1d)
     pwr1d = Power_1d(pla1d)
+    pwr1d.calc_pwr_in(pla1d)
     een1d.plot_Te(pla1d)
     for itn in range(niter):
         een1d.calc_th_cond_coeff(pla1d)
