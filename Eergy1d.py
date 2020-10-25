@@ -54,8 +54,8 @@ class Eergy_1d(object):
         self.Qe = 2.5*KB_EV*np.multiply(self.Te, txp.fluxe)
         self.dQe = 2.5*KB_EV*np.multiply(self.Te, txp.dfluxe)
         # calc conduction term
-        self.dTe = pla.goem.cnt_diff(self.Te)
-        self.d2Te = pla.goem.cnt_diff_2nd(self.Te)
+        self.dTe = pla.geom.cnt_diff(self.Te)
+        self.d2Te = pla.geom.cnt_diff_2nd(self.Te)
         self.Qe -= np.multiply(self.th_cond_e, self.dTe)
         self.dQe -= np.multiply(self.th_cond_e, self.d2Te)
         
