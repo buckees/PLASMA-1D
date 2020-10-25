@@ -63,4 +63,63 @@ class Eergy_1d(object):
         """Calc Te"""
         self.ergy_e += (-self.dQe + pwr.input)*delt
         self.Te = np.divide(self.ergy_e, self.Te)/1.5/KB_EV
+    
+    def plot_Te(self, pla):
+        """Plot eon temperature."""
+        x = pla.geom.x
+        fig, axes = plt.subplots(1, 2, figsize=(8, 4),
+                                 constrained_layout=True)
+        # plot potential
+        ax = axes[0]
+        ax.plot(x, self.Te, 'bo-')
+        ax.legend(['e Temperature'])
+        # plot E-field
+        ax = axes[1]
+        ax.plot(x, self.Te, 'bo-')
+        ax.legend(['e Temperature'])
+        # show fig
+        plt.show()
+        
+        
+if __name__ == '__main__':
+    """Test Eergy_1d."""
+    from Mesh import Mesh_1d
+    from Plasma1d import Plasma_1d
+    from Transp1d import Ambi_1d
+    from React1d import React_1d
+    from Power1d import Power_1d
+    mesh1d = Mesh_1d('Plasma_1d', 10e-2, nx=51)
+    print(mesh1d)
+    pla1d = Plasma_1d(mesh1d)
+    pla1d.init_plasma()
+    pla1d.plot_plasma()
+    # calc the transport 
+    txp1d = Ambi_1d(pla1d)
+    txp1d.calc_transp_coeff(pla1d)
+    txp1d.plot_transp_coeff(pla1d)
+    # calc source term
+    src1d = React_1d(pla1d)
+    #
+    ne_ave, ni_ave = [], []
+    time = []
+    dt = 1e-6
+    niter = 300
+    for itn in range(niter):
+        txp1d.calc_ambi(pla1d)
+        pla1d.den_evolve(dt, txp1d, src1d)
+        pla1d.bndy_plasma()
+        pla1d.limit_plasma()
+        ne_ave.append(np.mean(pla1d.ne))
+        ni_ave.append(np.mean(pla1d.ni))
+        time.append(dt*(niter+1))
+        if not (itn+1) % (niter/10):
+            txp1d.plot_flux(pla1d)
+            pla1d.plot_plasma()
+    #
+    een1d = Eergy_1d(pla1d)
+    for itn in range(niter):
+        een1d.calc_th_cond_coeff(pla1d)
+        een1d.calc_th_flux(pla1d, txp1d)
+        if not (itn+1) % (niter/10):
+            pla1d.plot_plasma()
 
