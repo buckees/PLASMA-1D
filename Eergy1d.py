@@ -83,3 +83,37 @@ class Eergy_1d(object):
         ax.legend(['e Temperature'])
         plt.show()
         
+if __name__ == '__main__':
+    """Test Eergy_1d."""
+    from Mesh import Mesh_1d
+    from Plasma1d import Plasma_1d
+    from Transp1d import Ambi_1d
+    from React1d import React_1d
+    from Power1d import Power_1d
+    mesh1d = Mesh_1d('Plasma_1d', 10e-2, nx=51)
+    print(mesh1d)
+    pla1d = Plasma_1d(mesh1d)
+    pla1d.init_plasma()
+    pla1d.plot_plasma()
+    # calc the transport 
+    txp1d = Ambi_1d(pla1d)
+    txp1d.calc_transp_coeff(pla1d)
+    txp1d.plot_transp_coeff(pla1d)
+    # calc source term
+    src1d = React_1d(pla1d)
+    #
+    ne_ave, ni_ave = [], []
+    time = []
+    dt = 1e-6
+    niter = 3000
+    for itn in range(niter):
+        txp1d.calc_ambi(pla1d)
+        pla1d.den_evolve(dt, txp1d, src1d)
+        pla1d.bndy_plasma()
+        pla1d.limit_plasma()
+        ne_ave.append(np.mean(pla1d.ne))
+        ni_ave.append(np.mean(pla1d.ni))
+        time.append(dt*(niter+1))
+        if not (itn+1) % (niter/10):
+            txp1d.plot_flux(pla1d)
+            pla1d.plot_plasma()

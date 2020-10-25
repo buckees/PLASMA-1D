@@ -6,7 +6,6 @@ Plasma_1d contains:
     temperature: copy from energy module    
 """
 
-from Mesh import Mesh_1d
 from Constants import AMU
 
 import numpy as np
@@ -145,6 +144,7 @@ class Plasma_1d(object):
 
 if __name__ == '__main__':
     """Test Plasma_1d."""
+    from Mesh import Mesh_1d
     from Transp1d import Diff_1d, Ambi_1d
     from React1d import React_1d
     mesh1d = Mesh_1d('Plasma_1d', 10e-2, nx=51)
