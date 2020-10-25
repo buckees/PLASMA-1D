@@ -106,7 +106,7 @@ class Plasma_1d(object):
         ax.set_xlabel('Position (m)')
         ax.set_ylabel('Temperature (eV)')
         # show fig
-        plt.show(fig)
+        plt.show()
 
     def init_pot(self, phi=0.0):
         """Initiate potential attributes."""
@@ -129,7 +129,7 @@ class Plasma_1d(object):
         ax.plot(x, self.ef, 'g-')
         ax.legend(['E-field'])
         # show fig
-        plt.show(fig)
+        plt.show()
 
     def den_evolve(self, delt, txp, src):
         """
