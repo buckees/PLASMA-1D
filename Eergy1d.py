@@ -62,9 +62,9 @@ class Eergy_1d(object):
     def calc_Te(self, delt, pla, pwr):
         """Calc Te"""
         self.ergy_e += (-self.dQe + pwr.input)*delt
-        self.Te = np.divide(self.ergy_e, self.Te)/1.5/KB_EV
+        self.Te = np.divide(self.ergy_e, self.ne)/1.5/KB_EV
         
-    def bndy_Te(self, pla):
+    def bndy_Te(self):
         """Impose b.c. on Te."""
         self.Te[0], self.Te[-1] = 0.1, 0.1
         
@@ -83,6 +83,7 @@ class Eergy_1d(object):
         ax.plot(x, self.Te, 'bo-')
         ax.legend(['e Temperature'])
         #
+        ax = axes[1]
         ax.plot(x, self.Te, 'bo-')
         ax.legend(['e Temperature'])
         plt.show()
@@ -115,20 +116,22 @@ if __name__ == '__main__':
         pla1d.den_evolve(dt, txp1d, src1d)
         pla1d.bndy_plasma()
         pla1d.limit_plasma()
-        ne_ave.append(np.mean(pla1d.ne))
-        ni_ave.append(np.mean(pla1d.ni))
-        time.append(dt*(niter+1))
-        if not (itn+1) % (niter/10):
-            txp1d.plot_flux(pla1d)
-            pla1d.plot_plasma()
+        # ne_ave.append(np.mean(pla1d.ne))
+        # ni_ave.append(np.mean(pla1d.ni))
+        # time.append(dt*(niter+1))
+        # if not (itn+1) % (niter/10):
+        #     txp1d.plot_flux(pla1d)
+        #     pla1d.plot_plasma()
     # Test Eergy_1d
     dt = 1e-15
     een1d = Eergy_1d(pla1d)
     pwr1d = Power_1d(pla1d)
+    een1d.plot_Te(pla1d)
     for itn in range(niter):
         een1d.calc_th_cond_coeff(pla1d)
         een1d.calc_th_flux(pla1d, txp1d)
         een1d.calc_Te(dt, pla1d, pwr1d)
+        een1d.bndy_Te()
         if not (itn+1) % (niter/10):
             een1d.plot_Te(pla1d)
             
