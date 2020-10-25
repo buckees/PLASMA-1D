@@ -70,7 +70,6 @@ class Transp_1d(object):
         ax.plot(x, self.Mue, 'bo-')
         ax.plot(x, self.Mui, 'ro-')
         ax.legend(['e Mobility', 'Ion Mobility'])
-        # show fig
         plt.show()
     
     def plot_flux(self, pla):
