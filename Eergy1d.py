@@ -62,7 +62,7 @@ class Eergy_1d(object):
     def calc_Te(self, delt, pla, pwr):
         """Calc Te"""
         self.ergy_e += (-self.dQe + pwr.input)*delt
-        self.Te = np.divide(self.ergy_e, self.ne)/1.5/KB_EV
+        self.Te = np.divide(self.ergy_e, pla.ne)/1.5/KB_EV
         
     def bndy_Te(self):
         """Impose b.c. on Te."""
@@ -123,7 +123,7 @@ if __name__ == '__main__':
         #     txp1d.plot_flux(pla1d)
         #     pla1d.plot_plasma()
     # Test Eergy_1d
-    dt = 1e-15
+    dt = 3e-7
     een1d = Eergy_1d(pla1d)
     pwr1d = Power_1d(pla1d)
     een1d.plot_Te(pla1d)
