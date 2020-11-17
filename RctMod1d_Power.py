@@ -29,7 +29,7 @@ class Power_1d(object):
         """Print eon energy module."""
         return f'label = {self.qdfluxe}'
     
-    def calc_pow_in(self, pla):
+    def calc_pwr_in(self, pla):
         """
         Calc thermal conduction coefficient.
 
@@ -38,4 +38,4 @@ class Power_1d(object):
         heat_cond_e: W/m/K, heat conductivity for eon
         """
         # calc thermal conductivity for eon
-        self.input = np.ones(pla.ne)*1.0
+        self.input = np.ones_like(pla.ne)*1.0
