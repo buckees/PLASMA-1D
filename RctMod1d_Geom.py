@@ -1,11 +1,12 @@
 """
-Define Geometry.
+Geometry module 1D, constructing the 1D geometry.
 
-Geometry --> 1d or 2d.
-Geometry contains:
-    intervals
-    materials
-    boundaries
+1D geometry is made of intervals.
+Assign materials to the shapes, such as
+'Metal', 'Quartz', etc.
+
+1D geometry is defined separately from 2D geometry,
+but they share the same strucuture.
 """
 
 from Domain import Domain_1d
