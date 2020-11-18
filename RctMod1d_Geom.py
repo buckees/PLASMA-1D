@@ -10,36 +10,46 @@ but they share the same strucuture.
 """
 
 import matplotlib.pyplot as plt
-import matplotlib.patches as patch
 import numpy as np
 
 class Interval():
     """Init the Interval."""
     
-    def __init__(self, label):
+    def __init__(self, label, lr):
         """
-        Init the Shape.
+        Init the Interval.
         
+        lr: unit in m, (2, ) tuple, defines the domain
         label: str, var, label of Interval.
         """
+        self.lr = np.asarray(lr)
         self.label = label
 
     def __str__(self):
         """Print Shape info."""
         return f'label = {self.label}'
+    
+    def __contains__(self, posn):
+        """
+        Determind if a position is inside the Interval.
+        
+        posn: unit in m, (2, ) array, position as input
+        boundaries are not consindered as "Inside"
+        """
+        return self.lr[0] <= posn and posn <= self.lr[1]
 
 class Domain(Interval):
     """Define the Domain."""
     
-    def __init__(self, bndy=(0.0, 1.0)):
+    def __init__(self, lr=(0.0, 1.0)):
         """
         Init the Domain.
         
-        bndy: unit in m, (2, ) tuple, defines the domain
+        lr: unit in m, (2, ) tuple, defines the domain
         label: Domain label is fixed to 'Plasma'
         """
-        self.bndy = np.asarray(bndy)
-        super().__init__(label='Plasma')
+        super().__init__(label='Plasma', lr=lr)
+        self.type = 'Domain'
 
     def __str__(self):
         """Print Domain info."""
@@ -59,8 +69,7 @@ class Segment(Interval):
         label: str, var, label of Interval.
         type: str, var, type of Interval
         """
-        super().__init__(label)
-        self.lr = np.asarray(lr)
+        super().__init__(label, lr)
         self.type = 'Segment'
 
     def __str__(self):
@@ -69,14 +78,7 @@ class Segment(Interval):
         res += f'\nleft and right bndy = {self.lr} m'
         return res
 
-    def __contains__(self, posn):
-        """
-        Determind if a position is inside the Interval.
-        
-        posn: unit in m, (2, ) array, position as input
-        boundaries are not consindered as "Inside"
-        """
-        return self.lr[0] <= posn and posn <= self.lr[1]
+
 
 class Geom1d():
     """Constuct the 1D geometry."""
@@ -114,7 +116,7 @@ class Geom1d():
         label: dict, label <-> number
         """
         self.lr = domain.lr
-        self.label ={'Plasma':0}
+        self.label ={domain.label:0}
         self.num_mat = 1
 
     def add_segment(self, segment):
@@ -161,7 +163,7 @@ class Geom1d():
         posn_label = self.get_label(posn)
         return res or (posn_label == label)
     
-    def plot(self, figsize=(8, 8), dpi=300, fname='Geometry'):
+    def plot(self, figsize=(8, 8), dpi=300):
         """
         Plot the 1D geometry.
         
@@ -169,30 +171,32 @@ class Geom1d():
         dpi: dimless, int, Dots Per Inch
         """
         color_dict = {0:'white', 1:'black', 2:'green', 3:'yellow', 
-                      4:'blue', 5:'pink', 6:'purple'}
+                      4:'blue', 5:'pink', 6:'grey'}
         
-        fig, axes = plt.subplots(1, 2, figsize=figsize, dpi=dpi,
-                                     constrained_layout=True)
+        fig, ax = plt.subplots(1, 1, figsize=figsize, dpi=dpi,
+                               constrained_layout=True)
         
-        ax = axes[0]
-        
+        ax.plot(self.lr, (0.0, 0.0), 'o-',
+                linewidth=5, color='purple', markersize=16)
         for segment in self.sequence:
             temp_col = color_dict[self.label[segment.label]]
-            ax.plot(segment.lr[0], segment.lr[1],
-                    linewidth=5, color=temp_col)
-            
-        ax = axes[1]
-        ax.plot(self.domain.lr[0], self.domain.lr[1],
-                linewidth=5, color='purple')
-        for segment in self.sequence:
-            ax.plot(segment.lr[0], segment.lr[1],
-                linewidth=5, color='grey')
+            ax.plot(segment.lr, (0.0, 0.0), 'o-',
+                linewidth=5, color=temp_col, markersize=16)
         # for ax in axes:
         #     ax.set_xlim(self.bl[0], self.bl[0] + self.domain[0])
         #     ax.set_ylim(self.bl[1], self.bl[1] + self.domain[1])
-        fig.savefig(fname, dpi=dpi)
+        fig.savefig(self.name, dpi=dpi)
         plt.close()
 if __name__ == '__main__':
     """Test 1D Geometry."""
-    geom1d = Geom_1d('A', 10e-2)
+    geom1d = Geom1d(name='1D_Test', is_cyl=False)
+    domain1d = Domain(lr=(-10.0, 10.0))
+    geom1d.add_domain(domain1d)
+    seg1 = Segment('M', (-10.0, -8.0))
+    geom1d.add_segment(seg1)
+    seg2 = Segment('M', (5.0, 10.0))
+    geom1d.add_segment(seg2)
+    seg3 = Segment('D', (-6.0, 0.0))
+    geom1d.add_segment(seg3)
+    geom1d.plot()
     print(geom1d)
