@@ -24,6 +24,7 @@ class Interval():
         """
         self.lr = np.asarray(lr)
         self.label = label
+        self.length = self.lr[1] - self.lr[0]
 
     def __str__(self):
         """Print Shape info."""
