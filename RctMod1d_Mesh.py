@@ -1,52 +1,75 @@
 """
-Define Mesh.
+Mesh Module.
 
-Mesh --> 1d or 2d.
-Mesh contains:
-    x position
+Create standalone mesh or
+Create mesh for input geometry.
 """
 
-from Geometry import Geom_1d
-
 import numpy as np
-import matplotlib.pyplot as plt
 from copy import deepcopy
+import matplotlib.pyplot as plt
 
-class Mesh_1d(Geom_1d):
-    """Define 1d Mesh."""
+class Mesh1d():
+    """Define 1D Mesh."""
 
-    def __init__(self, label, width, nx=11, res=0.1):
-        """Add option to choose nx or res for mesh."""
-        super().__init__(label, width)
+    def import_geom(self, geom):
+            """Import geometry."""
+            self.geom = geom
+
+    def generate_mesh(self, nx=11):
+        """Generate mesh according to the imported geometry."""
         self.nx = nx
-        self.delx = self.width/(self.nx-1)
-        self.x = np.linspace(0.0, self.width, self.nx)
+        self.x, self.delx = np.linspace(self.geom.lr[0], self.geom.lr[1], 
+                            self.nx, retstep=True)
+        self.mat = np.zeros_like(self.x)
+        self._find_bndy()
+        self._assign_mat()
+        self._calc_plasma_area()
+       
+    def create_mesh(self, bl=(0.0, 0.0), domain=(1.0, 1.0), ngrid=(11, 11)):
+        """Create standalone mesh."""
+        self.bl = np.asarray(bl)
+        self.domain = np.asarray(domain)
+        self.ngrid = np.asarray(ngrid)
+        self.res = np.divide(self.domain, self.ngrid - 1)
+        self.width, self.height = self.domain
+        self.nx, self.nz = self.ngrid
+        self.delx, self.delz = self.res
+        tempx = np.linspace(0.0, self.width, self.nx)
+        tempz = np.linspace(0.0, self.height, self.nz)
+        self.x, self.z = np.meshgrid(tempx, tempz)
+        self._find_bndy()
 
-    def __str__(self):
-        """Print 1d mesh information."""
-        res = 'Mesh_1d:'
-        res += '\n ' + super().__str__()
-        res += f'\nnx = {self.nx}'
-        res += f'\ndelx = {self.delx} m'
-        return res
-
-    def add_bndy(self):
+    def _find_bndy(self):
         """Add boundaries."""
-        pass
+        self.bndy = np.zeros_like(self.x)
+        self.bndy[0], self.bndy[-1] = 1, 1
 
-    def add_mat(self):
-        """Add materials."""
-        pass
+    def _assign_mat(self):
+        """Assign materials to nodes."""
+        for _idx, _x in enumerate(self.x):
+            _label, self.mat[_idx] = self.geom.get_label(_x)
+    
+    def _calc_plasma_area(self):
+        """Calc the total area of plasma region."""
+        self.area = 0
+        for _mat in self.mat:
+            if not _mat:
+                self.area += self.delx
 
-    def plot_mesh(self):
-        """Plot 1d mesh in X."""
-        fig, ax = plt.subplots(1, 1, figsize=(4, 4),
-                               constrained_layout=True)
-        y = np.zeros_like(self.x)
-        ax.plot(self.x, y, 'o')
-        plt.show(fig)
+    def plot(self, figsize=(8, 8), dpi=600, fname='Mesh.png',  ihoriz=1):
+        """Plot mesh."""
+        colMap = plt.get_cmap('Set1')
+        
+        fig, ax = plt.subplots(1, 1, figsize=figsize, dpi=dpi,
+                                 constrained_layout=True)
 
-    def cnt_diff(self, y):
+        ax.scatter(self.x, np.zeros_like(self.x), 
+                   c=self.mat, s=10, cmap=colMap)
+        fig.savefig(fname, dpi=dpi)
+        plt.close()
+
+    def cnt_diff(self, f):
         """
         Caculate dy/dx using central differencing.
         
@@ -55,16 +78,20 @@ class Mesh_1d(Geom_1d):
         dy[0] = dy[1]; dy[-1] = dy[-2]
         output: dy
         """
-        dy = np.zeros_like(self.x)
+        dfx = np.zeros_like(self.x)
+        dfz = np.zeros_like(self.z)
         # Although dy[0] and dy[-1] are signed here,
         # they are eventually specified in boundary conditions
         # dy[0] = dy[1]; dy[-1] = dy[-2]
         for i in range(1, self.nx-1):
-            dy[i] = (y[i+1] - y[i-1])/self.delx/2.0
-        dy[0], dy[-1] = deepcopy(dy[1]), deepcopy(dy[-2])
-        return dy
+            dfx[:, i] = (f[:, i+1] - f[:, i-1])/self.delx/2.0
+        for j in range(1, self.nz-1):
+            dfz[j, :] = (f[j+1, :] - f[j-1, :])/self.delz/2.0
+        dfx[:, 0], dfx[:, -1] = deepcopy(dfx[:, 1]), deepcopy(dfx[:, -2])
+        dfz[0, :], dfz[-1, :] = deepcopy(dfz[1, :]), deepcopy(dfz[-2, :])
+        return dfx, dfz
     
-    def cnt_diff_2nd(self, y):
+    def cnt_diff_2nd(self, f):
         """
         Caculate d2y/dx2 using 2nd order central differencing.
 
@@ -73,21 +100,38 @@ class Mesh_1d(Geom_1d):
         d2y[0] = d2y[1]; d2y[-1] = d2y[-2]
         output: d2y/dx2
         """
-        d2y = np.zeros_like(self.x)
+        d2fx = np.zeros_like(self.x)
+        d2fz = np.zeros_like(self.z)
         # Although dy[0] and dy[-1] are signed here,
         # they are eventually specified in boundary conditions
         # d2y[0] = d2y[1]; d2y[-1] = d2y[-2]
         for i in range(1, self.nx-1):
-            d2y[i] = (y[i+1] - 2 * y[i] + y[i-1])/self.delx**2
-        d2y[0], d2y[-1] = deepcopy(d2y[1]), deepcopy(d2y[-2])
-        return d2y
-
+            d2fx[:, i] = (f[:, i+1] - 2 * f[:, i] + f[:, i-1])/self.delx**2
+        for j in range(1, self.nz-1):
+            d2fz[j, :] = (f[j+1, :] - 2 * f[j, :] + f[j-1, :])/self.delz**2
+        d2fx[:, 0], d2fx[:, -1] = deepcopy(d2fx[:, 1]), deepcopy(d2fx[:, -2])
+        d2fz[0, :], d2fz[-1, :] = deepcopy(d2fz[1, :]), deepcopy(d2fz[-2, :])
+        d2f = d2fx + d2fz
+        return d2f
 
 if __name__ == '__main__':
-    """Test Mesh."""
-    geom1d = Geom_1d('A', 10e-2)
-    mesh1d = Mesh_1d(geom1d.label, geom1d.width,
-                     nx=101)
-    # print(geom1d)
-    print(mesh1d)
-    mesh1d.plot_mesh()
+    """Test 1D Mesh."""
+    from RctMod1d_Geom import Geom1d, Domain, Segment
+    # build the geometry
+    geom1d = Geom1d(name='1D_Test', is_cyl=False)
+    domain1d = Domain(lr=(-10.0, 10.0))
+    geom1d.add_domain(domain1d)
+    seg1 = Segment('M', (-10.0, -8.0))
+    geom1d.add_segment(seg1)
+    seg2 = Segment('M', (5.0, 10.0))
+    geom1d.add_segment(seg2)
+    seg3 = Segment('D', (-6.0, 0.0))
+    geom1d.add_segment(seg3)
+    geom1d.plot()
+    print(geom1d)
+
+    # generate mesh to imported geometry
+    mesh1d = Mesh1d()
+    mesh1d.import_geom(geom1d)
+    mesh1d.generate_mesh(nx=101)
+    mesh1d.plot()
